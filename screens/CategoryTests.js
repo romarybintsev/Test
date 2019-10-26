@@ -1,47 +1,90 @@
+// Imports
+
 import React from 'react';
-import { Button, View, Text, FlatList, StyleSheet } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
-var db = openDatabase({ name: 'mydb.db', createFromLocation : 1, location:'Documents' });
+import { TestsList } from '../components/tests_list';
+
+// Variables
+
+var emitter = require('tiny-emitter/instance');
+var db = openDatabase({ name: 'mydb.db', createFromLocation: 1, location: 'Documents' });
+
+// Tests Screen
 
 export default class CategoryTestsScreen extends React.Component {
     constructor(props) {
         super(props);
-        const category_id = this.props.navigation.getParam('category_id', 'NO-ID');
         this.state = {
-            FlatListItems: [],
+            tests_info: [],
+            tests_stats: [],
+            update_tests: 5,
         }
+    }
+    componentDidMount() {
         that = this;
-        db.transaction(function (txn) {
-            txn.executeSql(
-                'SELECT DISTINCT "test_id" FROM Questions WHERE "category_id"=?',
-                [category_id],
-                (txn, results) => {
-                    var tests = [];
-                    var len = results.rows.length;
-                    for (let i = 0; i < len; i++) {
-                        tests.push(results.rows.item(i).test_id);
-                    }
-                    that.setState({
-                        FlatListItems: tests,
-                    });
-                }
-            );
+        emitter.on('update_tests', function () {
+            that.setState({ update_tests: premium })
         });
+
+        CheckScoreSubscription = this.props.navigation.addListener('willFocus', () => {
+            that = this;
+            new Promise((resolve, reject) => {
+                db.transaction(function (txn) { // Get Test Information
+                    txn.executeSql(
+                        'WITH latest_tests AS (\
+                        SELECT test_id, MAX(created_date) as max_created_date FROM test_results\
+                        GROUP BY 1\
+                    ),\
+                    \
+                    test_num_of_questions AS (\
+                        SELECT test_id, COUNT(id) as num_questions FROM questions\
+                        GROUP BY 1\
+                    ),\
+                    \
+                    latest_test_scores AS (\
+                        SELECT tr.* FROM test_results AS tr INNER JOIN latest_tests AS lt \
+                        ON tr.test_id = lt.test_id \
+                        AND tr.created_date = lt.max_created_date\
+                    )\
+                    \
+                    SELECT t.*, lts.result, tnoq.num_questions as num_questions FROM tests AS t LEFT JOIN latest_test_scores AS lts \
+                    ON t.id = lts.test_id\
+                    INNER JOIN test_num_of_questions AS tnoq \
+                    ON t.id = tnoq.test_id',
+                        [],
+                        (txn, results) => {
+                            var tests_info = [];
+                            var len = results.rows.length;
+                            for (let i = 0; i < len; i++) {
+                                tests_info.push(results.rows.item(i))
+                            }
+                            resolve(tests_info)
+                        }
+                    );
+                });
+            }).then((tests_info) => {
+                db.transaction(function (txn) { // Get Test Information
+                    txn.executeSql('WITH test_num_questions AS (SELECT test_id, COUNT(id) as num_questions \
+                FROM questions GROUP BY 1) SELECT AVG(CASE WHEN tr.result >= t.pass_mark THEN 1 ELSE 0 END) \
+                as avg_pass_rate, AVG(tr.result*100 / tnq.num_questions) AS avg_pct_mark FROM test_results tr \
+                INNER JOIN test_num_questions tnq ON tr.test_id = tnq.test_id INNER JOIN tests t ON tr.test_id = t.id', [],
+                        (txn, results) => {
+                            that.setState({
+                                tests_stats: results.rows.item(0),
+                                tests_info: tests_info,
+                            })
+                        })
+                })
+            })
+        })
+    }
+    componentWillUnmount() {
+        CheckScoreSubscription.remove()
+        emitter.off('update_tests');
     }
     render() {
-        const category_id = this.props.navigation.getParam('category_id', 'NO-ID');
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>Category {this.state.category_id} Screen</Text>
-                <FlatList
-                    data={this.state.FlatListItems}
-                    renderItem={({ item }) =>
-                        <Button
-                            title={'Go to Test ' + item}
-                            onPress={() => this.props.navigation.navigate('Quiz', { test_id: item, category_id: category_id })}
-                        />}
-                />
-            </View>
+            <TestsList tests_stats={this.state.tests_stats} data={this.state.tests_info} navigation={this.props.navigation} />
         );
     }
 }

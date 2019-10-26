@@ -1,45 +1,76 @@
+// Imports
+
 import React from 'react';
-import { Button, View, Text, StyleSheet, TouchableWithoutFeedback, Animated } from 'react-native';
+import { ScrollView, StatusBar, Dimensions, View, Text, TouchableWithoutFeedback } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
-import { white, grey } from 'ansi-colors';
-var db = openDatabase({ name: 'mydb.db', createFromLocation : 1, location:'Documents' });
+import LinearGradient from 'react-native-linear-gradient';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import EStyleSheet from 'react-native-extended-stylesheet';
+
+// Variables
+
+var emitter = require('tiny-emitter/instance');
+var db = openDatabase({ name: 'mydb.db', createFromLocation: 1, location: 'Documents' });
+var { height, width } = Dimensions.get('window');
+if (height > 667) {
+  QUESTION_MAX_HEIGHT = height / 3
+}
+else {
+  QUESTION_MAX_HEIGHT = height / 3
+}
+
+// Test Screen (props data + question_bank)
 
 export default class TestScreen extends React.Component {
   constructor(props) {
     super(props);
+
     this.qno = 0
     this.score = 0
-
-
     this.questions = []
     this.user_answers = []
     this.correct_asnwers = []
 
     data_array = this.props.send_data
     questionbank = this.props.questionbank
+
+    if (!questionbank) {
+      test_id = this.props.send_test_id;
+    }
+
     this.state = {
       data: data_array,
+      test_length: data_array.length,
       question_id: data_array[this.qno].id,
       question: data_array[this.qno].question,
       options: data_array[this.qno].options,
       correctoption: data_array[this.qno].correct.split(","),
       explanation: data_array[this.qno].explanation,
       answered: false,
-      option_color: 'gray',
       pressed_option: '',
       next_hidden: true,
-      expl_button_hidden: true,
       expl_hidden: true,
       questionbank: questionbank,
       select_options: [],
     }
-    if (!this.state.questionbank) {
-      category_id = this.props.send_cat_id;
-      test_id = this.props.send_test_id;
-    }
-    console.log(this.state.correctoption);
-
     that = this;
+  }
+  shuffle_options(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
   }
 
   explanation() {
@@ -55,87 +86,110 @@ export default class TestScreen extends React.Component {
 
         db.transaction(function (txn) {
           txn.executeSql(
-            'INSERT INTO Test_results ("category_id", "test_id", "result") VALUES (?,?,?)',
-            [category_id, test_id, that.score * 100 / that.state.data.length],
+            'INSERT INTO Test_results ("test_id", "result") VALUES (?,?)',
+            [test_id, that.score],
             (txn, results) => {
               console.log('Added to Test_results');
             });
         }, null, null);
       }
-      console.log(this.questions, this.user_answers, this.correct_asnwers);
-      this.props.quizFinish(this.score * 100 / this.state.data.length, this.questions, this.user_answers, this.correct_asnwers);
+      this.props.quizFinish(this.score, this.questions, this.user_answers, this.correct_asnwers);
 
     }
-    this.setState({ answered: false })
-    this.setState({ next_hidden: true })
-    this.setState({ expl_button_hidden: true })
-    this.setState({ expl_hidden: true })
-    this.setState({ select_option: []})
-
+    this.setState({
+      answered: false,
+      next_hidden: true,
+      expl_hidden: true,
+      select_options: [],
+    })
   }
 
   select_option(k) {
-    if (this.state.select_options.includes(k)) { // Deselects if option already selected
-      selected_options = this.state.select_options
-      selected_options = selected_options.filter(e => e !== k);
-      this.setState({ select_options: selected_options})
-    }
-    else if (this.state.select_options.length < (this.state.correctoption.length - 1) && !this.state.select_options.includes(k)) {
-      selected_options = this.state.select_options //Selects if option not selected 
-      selected_options.push(k)
-      this.setState({ select_options: selected_options})
-    }
-    else if (this.state.select_options.length < this.state.correctoption.length && !this.state.select_options.includes(k)){
-      selected_options = this.state.select_options // Selects option and checks the answer 
-      selected_options.push(k)
-      this.setState({ select_options: selected_options})
-      this.check_answer(that.state.select_options);
+    if (this.state.answered == false) {
+      if (this.state.select_options.includes(k)) { // Deselects if option already selected
+        selected_options = this.state.select_options
+        selected_options = selected_options.filter(e => e !== k);
+        this.setState({ select_options: selected_options })
+      }
+      else if (this.state.select_options.length < (this.state.correctoption.length - 1) && !this.state.select_options.includes(k)) {
+        selected_options = this.state.select_options //Selects if option not selected 
+        selected_options.push(k)
+        this.setState({ select_options: selected_options })
+      }
+      else if (this.state.select_options.length < this.state.correctoption.length && !this.state.select_options.includes(k)) {
+        selected_options = this.state.select_options // Selects option and checks the answer 
+        selected_options.push(k)
+        this.setState({ select_options: selected_options })
+        this.check_answer(that.state.select_options);
+      }
     }
   }
-change_color(k) {
+  change_color(k) {
     if (this.state.correctoption.length == 1 && this.state.answered == false) {
-      btn_color = 'gray'
+      btn_color = 'white'
+      icon_name = 'circle'
+      fill_color = 'rgb(200,200,200)'
     }
-    else if (this.state.correctoption.length > 1 && this.state.answered == false){
-      if(this.state.select_options.includes(k)){
-        btn_color = 'orange'
+    else if (this.state.correctoption.length > 1 && this.state.answered == false) {
+      if (this.state.select_options.includes(k)) {
+        btn_color = '#FCCB39'
+        icon_name = 'dot-circle'
+        fill_color = 'white'
       }
       else {
-        btn_color = 'gray'
+        btn_color = 'white'
+        icon_name = 'circle'
+        fill_color = 'rgb(200,200,200)'
       }
     }
     else {
-      if (this.state.correctoption.length == 1){
+      if (this.state.correctoption.length == 1) {
         if (k == this.state.correctoption) {
-          btn_color = 'green'
+          btn_color = '#4AB027'
+          icon_name = 'check-circle'
+          fill_color = 'white'
         }
         else if (k != this.state.correctoption && k == this.state.pressed_option) {
-          btn_color = 'red'
+          btn_color = '#EA2557'
+          icon_name = 'times-circle'
+          fill_color = 'white'
         }
         else {
-          btn_color = 'gray'
+          btn_color = 'white'
+          icon_name = 'circle'
+          fill_color = 'rgb(200,200,200)'
         }
       }
       else {
-        if(this.state.correctoption.includes(k)){
-          btn_color = 'green'
+        if (this.state.correctoption.includes(k)) {
+          btn_color = '#4AB027'
+          icon_name = 'check-circle'
+          fill_color = 'white'
         }
-        else if (!this.state.correctoption.includes(k) && this.state.select_options.includes(k)){
-          btn_color = 'red'
+        else if (!this.state.correctoption.includes(k) && this.state.select_options.includes(k)) {
+          btn_color = '#EA2557'
+          icon_name = 'times-circle'
+          fill_color = 'white'
         }
         else {
-          btn_color = 'gray'
+          btn_color = 'white'
+          icon_name = 'circle'
+          fill_color = 'rgb(200,200,200)'
         }
       }
     }
-    return btn_color
+    return {
+      btn_color: btn_color,
+      icon_name: icon_name,
+      fill_color: fill_color,
+    }
   }
 
   multiple_choice_check() {
     sorted_answer = this.state.correctoption.sort()
     sorted_options = this.state.select_options.sort()
-    for (i=0; i < sorted_answer.length; i++) {
-      if (sorted_answer[i] !== sorted_options[i]){
+    for (i = 0; i < sorted_answer.length; i++) {
+      if (sorted_answer[i] !== sorted_options[i]) {
         return false
       }
     }
@@ -155,7 +209,7 @@ change_color(k) {
         }
       }
       else {
-        if(this.multiple_choice_check()){
+        if (this.multiple_choice_check()) {
           this.score += 1
           correct = 1
         }
@@ -163,11 +217,10 @@ change_color(k) {
           correct = 0
         }
       }
-      this.setState({ 
+      this.setState({
         answered: true,
         next_hidden: false,
-        expl_button_hidden: false,
-       })
+      })
 
       this.questions.push(this.state.question);
       this.user_answers.push(ans);
@@ -188,91 +241,218 @@ change_color(k) {
 
   }
   render() {
-
     let _this = this
     const currentOptions = this.state.options
-  
 
     const options = Object.keys(currentOptions).map(function (k) {
-      return (<View key={k} style={styles.option}>
-        <Button color={_this.change_color(k)} onPress={() => _this.check_answer(k)} title={currentOptions[k]} />
-      </View>)
+      if (currentOptions[k] != null) {
+        return (<View key={k}>
+          <TouchableWithoutFeedback onPress={() => _this.check_answer(k)}>
+            <View style={styles.option}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.list_title}>{currentOptions[k]}</Text>
+              </View>
+              <View style={{ flex: 0, alignSelf: 'center' }}>
+                <FontAwesomeIcon style={{
+                  marginLeft: 8,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 2,
+                  elevation: 5,
+                }} size={28} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>)
+      }
     });
 
     const multiple_options = Object.keys(currentOptions).map(function (k) {
-      return (<View key={k} style={styles.option}>
+      if (currentOptions[k] != null) {
+        return (<View key={k}>
+          <TouchableWithoutFeedback onPress={() => _this.select_option(k)}>
+            <View style={styles.option}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.list_title}>{currentOptions[k]}</Text>
+              </View>
+              <View style={{ flex: 0, alignSelf: 'center' }}>
+                <FontAwesomeIcon style={{
+                  marginLeft: 8,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 2,
+                  elevation: 5,
+                }} size={28} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
 
-        <Button color={_this.change_color(k)} onPress={() => _this.select_option(k)} title={currentOptions[k]} />
-
-      </View>)
+        </View>)
+      }
     });
 
+    const correct_options = this.state.correctoption.map(function (k) {
+      return (
+        <View key={k} style={styles.option}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.list_title}>{currentOptions[k]} </Text>
+          </View>
+          <View style={{ flex: 0, alignSelf: 'center' }}>
+            <FontAwesomeIcon style={{
+              marginLeft: 8,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.2,
+              shadowRadius: 2,
+              elevation: 5,
+            }} size={28} color={'#4AB027'} icon={'check-circle'} />
+          </View>
+        </View>
+      )
+    })
+
     return (
-      <View style={{ flex: 1 }}>
-
-        <View>
-          <Text style={styles.question}>
-            {this.state.question}
-          </Text>
+      <View style={{ flex: 1, backgroundColor: 'rgb(248,248,248)', padding: EStyleSheet.value('16rem'), }}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.header}>
+          <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1, padding: EStyleSheet.value('16rem') }}>
+            <View style={styles.question_view}>
+              <Text style={styles.question_number}>Question {this.qno + 1} of {this.state.test_length}</Text>
+              <Text style={[styles.question, { fontSize: this.state.question.length > 120 ? EStyleSheet.value('16rem') : EStyleSheet.value('20rem') }]}>
+                {this.state.question}
+              </Text>
+            </View>
+          </LinearGradient>
         </View>
-        <View>
-          {this.state.correctoption.length == 1 ? options : multiple_options}
-        </View>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: 'flex-end' }}>
-          {this.state.expl_button_hidden ? (<View style={styles.explanation_button}>
-            <Text>Explanation</Text>
-          </View>
-          ) : (
-              <View style={{ flex: 1, backgroundColor: "red" }}>
-                <Button onPress={() => this.explanation()} title='Explanation'></Button>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {this.state.expl_hidden ?
+            <View style={{ marginTop: QUESTION_MAX_HEIGHT }}>
+              {this.state.correctoption.length == 1 ? options : multiple_options}
+            </View> :
+            <View style={{ marginTop: QUESTION_MAX_HEIGHT }}>
+              {correct_options}
+              <View style={styles.explanation_view}>
+                <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), color: 'gray', marginBottom: 5 }}>Explanation</Text>
+                <ScrollView style={{ maxHeight: height / 5 }}>
+                  <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem') }}>{this.state.explanation}</Text>
+                </ScrollView>
               </View>
-            )}
-          {this.state.next_hidden ? (<View style={styles.next_button}>
-            <Text>Next</Text>
+            </View>}
+          <View>
           </View>
-          ) : (
-              <View style={{ flex: 1, backgroundColor: "green" }}>
-                <Button onPress={() => this.next()} title='Next'></Button>
-              </View>
-            )}
-
-        </View>
-        {this.state.expl_hidden ? (<View></View>
-        ) : (<Text>{this.state.explanation}</Text>)}
+          <View style={{ flex: 1, flexDirection: "row", alignItems: 'flex-end', justifyContent: 'center' }}>
+            {this.state.next_hidden ? (null
+            ) : (
+                <View style={{ flex: 1 }}>
+                  {this.state.expl_hidden && this.state.explanation != null ?
+                    <TouchableWithoutFeedback onPress={() => this.explanation()}>
+                      <Text style={styles.explanation_button}>View Explanation</Text>
+                    </TouchableWithoutFeedback> : null}
+                  <TouchableWithoutFeedback onPress={() => this.next()}>
+                    <Text style={styles.next_button}>{this.qno < this.state.data.length - 1 ? 'Next' : 'Finish'}</Text>
+                  </TouchableWithoutFeedback>
+                </View>
+              )}
+          </View>
+        </ScrollView>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  explanation_button: {
-    flex: 1,
-    backgroundColor: 'red',
-    color: 'grey',
-    padding: 20,
-    alignItems: 'center'
-
+const styles = EStyleSheet.create({
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: QUESTION_MAX_HEIGHT,
+    zIndex: 101,
   },
-  next_button: {
-    flex: 1,
-    backgroundColor: 'green',
-    color: 'grey',
-    padding: 20,
-    alignItems: 'center'
+  question_view: {
+    marginTop: QUESTION_MAX_HEIGHT / 3.5,
+    marginLeft: '15rem',
+  },
+  question_number: {
+    fontFamily: 'Nunito-Light',
+    color: 'white',
   },
   question: {
-    color: 'grey',
-    textAlign: 'center',
-    margin: 20,
+    fontFamily: 'Nunito-Bold',
+    color: 'white',
+    marginTop: '15rem',
   },
   option: {
-    backgroundColor: 'lightgrey',
-    padding: 10,
-    margin: 5,
-    borderRadius: 20,
+    justifyContent: 'space-between',
+    // flexGrow: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 5,
+    marginTop: '5rem',
+    marginLeft: '10rem',
+    marginRight: '10rem',
+    borderRadius: '10rem',
+    paddingLeft: '15rem',
+    paddingRight: '22rem',
+    paddingTop: '16rem',
+    paddingBottom: '16rem',
+  },
+  explanation_view: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 5,
+    marginTop: 5,
+    marginLeft: '10rem',
+    marginRight: '10rem',
+    borderRadius: '10rem',
+    paddingLeft: '15rem',
+    paddingRight: '22rem',
+    paddingTop: '22rem',
+    paddingBottom: '22rem',
+  },
+  list_title: {
+    fontSize: '18rem',
+    color: 'rgb(64,64,64)',
+    fontFamily: 'Nunito-Regular',
+  },
+  explanation_button: {
+    textAlign: 'center',
+    borderRadius: 10,
+    paddingLeft: '8rem',
+    paddingRight: '8rem',
+    paddingTop: '11rem',
+    paddingBottom: '11rem',
+    color: '#396AFC',
+    fontSize: '20rem',
+    fontFamily: 'Nunito-Regular',
+    backgroundColor: 'transparent',
+    borderColor: '#396AFC',
+    borderWidth: 1,
+    marginTop: '20rem',
+    marginLeft: '10rem',
+    marginRight: '10rem',
+  },
+  next_button: {
+    textAlign: 'center',
+    borderRadius: 10,
+    paddingLeft: '8rem',
+    paddingRight: '8rem',
+    paddingTop: '11rem',
+    paddingBottom: '11rem',
     color: 'white',
-    borderColor: 'black',
-    borderWidth: 2,
-    textAlign: 'left',
-  }
+    fontSize: '20rem',
+    fontFamily: 'Nunito-Regular',
+    backgroundColor: '#396AFC',
+    margin: '10rem',
+  },
 });

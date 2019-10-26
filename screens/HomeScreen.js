@@ -1,26 +1,109 @@
+// Imports
+
 import React from 'react';
-import { Button, View, Text, Alert } from 'react-native';
-import RNIap, {
-  acknowledgePurchaseAndroid,
-  purchaseErrorListener,
-  purchaseUpdatedListener,
-} from 'react-native-iap';
+import { Image, StatusBar, Dimensions, View, Text, Alert, } from 'react-native';
+import RNIap, { acknowledgePurchaseAndroid, purchaseErrorListener, purchaseUpdatedListener, } from 'react-native-iap';
 import { openDatabase } from 'react-native-sqlite-storage';
-var db = openDatabase({ name: 'mydb.db', createFromLocation : 1, location:'Documents' });
+import { HomeCard } from '../components/home_cards'
+import LinearGradient from 'react-native-linear-gradient';
+import EStyleSheet from 'react-native-extended-stylesheet';
+
+// Variables
+
+var { height, width } = Dimensions.get('window');
+var db = openDatabase({ name: 'mydb.db', createFromLocation: 1, location: 'Documents' });
 var emitter = require('tiny-emitter/instance');
 let purchaseUpdateSubscription;
 let purchaseErrorSubscription;
 
+if (height > 667) {
+  HEADER_MAX_HEIGHT = height / 3
+  QUESTION_MAX_HEIGHT = height / 3
+}
+else {
+  HEADER_MAX_HEIGHT = height / 3
+  QUESTION_MAX_HEIGHT = height / 3
+}
+
+const question_bank_sql = 'WITH latest_answer_per_question AS \
+( SELECT question_id, correct, MAX(created_date) FROM user_answers GROUP BY 1)\
+\
+SELECT t1.* FROM questions as t1 Inner join latest_answer_per_question as t2 \
+ON t1.id = t2.question_id \
+AND t2.correct = 0';
+
+// Main Screen
+
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       receipt: '',
       availableItemsMessage: '',
+      num_completed: 0,
+      test_len: 0,
+      question_bank_len: 0,
     };
   }
+
   async componentDidMount() {
+    that = this;
+    const { navigation } = this.props;
+    CheckScoreSubscription = navigation.addListener('willFocus', () => {
+      that = this;
+      db.transaction(function (txn) { // Get Test Information
+        txn.executeSql(
+          'WITH latest_tests AS (\
+                  SELECT test_id, MAX(created_date) as max_created_date FROM test_results\
+                  GROUP BY 1\
+              ),\
+              \
+              test_num_of_questions AS (\
+                  SELECT test_id, COUNT(id) as num_questions FROM questions\
+                  GROUP BY 1\
+              ),\
+              \
+              latest_test_scores AS (\
+                  SELECT tr.* FROM test_results AS tr INNER JOIN latest_tests AS lt \
+                  ON tr.test_id = lt.test_id \
+                  AND tr.created_date = lt.max_created_date\
+              )\
+              \
+              SELECT t.*, lts.result, tnoq.num_questions as num_questions FROM tests AS t LEFT JOIN latest_test_scores AS lts \
+              ON t.id = lts.test_id\
+              INNER JOIN test_num_of_questions AS tnoq \
+              ON t.id = tnoq.test_id',
+          [],
+          (txn, results) => {
+            var num_completed = 0
+            var len = results.rows.length;
+            for (let i = 0; i < len; i++) {
+              if (results.rows.item(i).result != null) { // Check if test result is not null (i.e completed)
+                num_completed += 1
+              }
+            }
+            that.setState({
+              num_completed: num_completed,
+              test_len: len,
+            });
+          }
+        );
+      });
+
+      db.transaction(function (txn) { // get question bank len
+        txn.executeSql(
+          question_bank_sql,
+          [],
+          (txn, results) => {
+            var q_len = results.rows.length;
+            console.log('hello', q_len)
+            that.setState({
+              question_bank_len: q_len,
+            })
+          });
+      });
+
+    });
     try {
       const result = await RNIap.initConnection();
       await RNIap.consumeAllItemsAndroid();
@@ -29,33 +112,32 @@ export default class HomeScreen extends React.Component {
       console.log(err);
     }
 
-  purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
-    console.log('purchaseUpdatedListener', purchase);
-    const receipt = purchase.transactionReceipt;
-    const receiptBody = {
+    purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
+      const receipt = purchase.transactionReceipt;
+      const receiptBody = {
         'receipt-data': receipt
       };
-    const result = await RNIap.validateReceiptIos(receiptBody, true); // true = sandbox
-    if (receipt) {
+      const validation = await RNIap.validateReceiptIos(receiptBody, true); // true = sandbox
+      if (receipt && validation.status == 0) {
         // Set Full version in DB to 1
-        new Promise ((resolve, reject) => { 
-        db.transaction(function (txn) {
+        new Promise((resolve, reject) => {
+          db.transaction(function (txn) {
             txn.executeSql(
-                'UPDATE config SET full_version=1',
-                [],
-                (txn, results) => {
-                    if (results.rowsAffected > 0){
-                        result = true //Full version created
-                    }
-                    else {
-                        result = false //Nothing happened
-                    }
-                    resolve(result);
+              'UPDATE config SET full_version=1',
+              [],
+              (txn, results) => {
+                if (results.rowsAffected > 0) {
+                  result = true //Full version created
                 }
+                else {
+                  result = false //Nothing happened
+                }
+                resolve(result);
+              }
             );
+          })
         })
-    })
-        .then(function(result) {
+          .then((result) => {
             if (result) {
               // Tell the store that you have delivered what has been paid for.
               // Failure to do this will result in the purchase being refunded on Android and
@@ -73,52 +155,64 @@ export default class HomeScreen extends React.Component {
             } else {
               // Retry / conclude the purchase is fraudulent, etc...
             }
-            emitter.emit('stop_loader','');
+            global.premium = 1
+            emitter.emit('update_tests', '');
+            emitter.emit('stop_loader', '');
           });
-        }
-      });
+      }
+    });
 
-  purchaseErrorSubscription = purchaseErrorListener((error) => {
-    emitter.emit('stop_loader','');
-    console.log('purchaseErrorListener', error);
-    error_code = error['responseCode'];
-    if(error_code == 0){
-      Alert.alert('Error','Cannot connect to iTunes. Please check your internet connection.');
+    purchaseErrorSubscription = purchaseErrorListener((error) => {
+      error_code = error['responseCode'];
+      if (error_code == 0) {
+        Alert.alert('Error', 'Cannot connect to iTunes. Please check your internet connection.');
+      }
+      emitter.emit('stop_loader', '');
+    });
+
+  }
+  componentWillUnmount() {
+    if (purchaseUpdateSubscription) {
+      purchaseUpdateSubscription.remove();
+      purchaseUpdateSubscription = null;
     }
-  });
-  
-}
-componentWillUnmount() {
-  if (purchaseUpdateSubscription) {
-    purchaseUpdateSubscription.remove();
-    purchaseUpdateSubscription = null;
+    if (purchaseErrorSubscription) {
+      purchaseErrorSubscription.remove();
+      purchaseErrorSubscription = null;
+    }
+    CheckScoreSubscription.remove()
   }
-  if (purchaseErrorSubscription) {
-    purchaseErrorSubscription.remove();
-    purchaseErrorSubscription = null;
-  }
-}
   render() {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Home Screen</Text>
-        <Button
-          title="Go to Categories"
-          onPress={() => this.props.navigation.navigate('Categories')}
-        />
-        <Button
-          title="Go to Question Bank"
-          onPress={() => this.props.navigation.navigate('QuestionBank')}
-        />
-        <Button
-          title="Go to Statistics"
-          onPress={() => this.props.navigation.navigate('Statistics')}
-        />
-        <Button
-          title="Buy Products"
-          onPress={() => this.props.navigation.navigate('BuyProducts')}
-        />
+      <View style={{ flex: 1, backgroundColor: '#E8E8E8' }}>
+        <StatusBar barStyle="light-content" />
+        <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1, padding: 20 }}>
+          <View style={styles.header_title_view}>
+            <Text style={styles.header_title}>Life in the UK</Text>
+            <Text style={styles.header_title}>Test Preparation</Text>
+          </View>
+          <View style={{ flex: 1, marginTop: EStyleSheet.value('20rem'), marginBottom: EStyleSheet.value('10rem'), zIndex: 1, }}>
+            <HomeCard navigate_to={() => this.props.navigation.navigate('CategoryTests')} title='Practice Tests' second_text={this.state.num_completed + ' of ' + this.state.test_len + ' tests completed'} />
+            <HomeCard navigate_to={() => this.props.navigation.navigate('QuestionBank')} title='Challenge Bank' second_text={this.state.question_bank_len + (this.state.question_bank_len == 1 ? ' question in the bank' : ' questions in the bank')} question_bank={this.state.question_bank_len} />
+            {premium == 0 ? <HomeCard navigate_to={() => this.props.navigation.navigate('BuyProducts')} title='Premium' second_text='Unlock all tests and more' /> : null}
+            <HomeCard navigate_to={() => this.props.navigation.navigate('Settings')} title='Settings' second_text='Additional Resources' />
+          </View>
+          <Image style={{ alignSelf: 'center', width: width, height: EStyleSheet.value('150rem'), position: 'absolute', bottom: 0, opacity: 0.2, }} source={require('../assets/img/home.png')} />
+        </LinearGradient>
       </View>
     );
   }
 }
+
+const styles = EStyleSheet.create({
+  header_title_view: {
+    marginTop: '55rem',
+    marginLeft: '25rem',
+  },
+  header_title: {
+    fontFamily: 'Nunito-Bold',
+    zIndex: 10,
+    color: 'white',
+    fontSize: '30rem',
+  },
+})

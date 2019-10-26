@@ -1,59 +1,43 @@
-import React from 'react';
-import { Button, View, Text } from 'react-native';
-import { createAppContainer } from 'react-navigation';
-import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { createStackNavigator } from 'react-navigation-stack';
+// Imports
 
-import HomeScreen from './screens/HomeScreen';
-import CategoriesScreen from './screens/CategoriesScreen';
-import CategoryTestScreen from './screens/CategoryTests';
-import TestScreen from './screens/TestScreen';
-import QuizScreen from './screens/QuizScreen';
-import ReviewScreen from './screens/ReviewScreen';
-import QuestionBankScreen from './screens/QuestionBankScreen';
-import StatisticsScreen from './screens/StatisticsScreen';
-import BuyProductScreen from './screens/BuyProductScreen';
-import SettingsScreen from './screens/SettingsScreen';
+import { Dimensions } from 'react-native';
+import { AppMain } from './components/bottom_navigator';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { far, faTimesCircle } from '@fortawesome/free-regular-svg-icons'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faLayerGroup, faExclamationCircle, faHome, faStar, faTimes, faCheckSquare, faChevronCircleLeft, faCoffee, faCheckCircle, faChevronRight, faCircle, faDotCircle, faLock } from '@fortawesome/free-solid-svg-icons'
+import { openDatabase } from 'react-native-sqlite-storage';
+import EStyleSheet from 'react-native-extended-stylesheet';
 
+// Variables
 
-class ProfileScreen extends React.Component {
-  render() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Profile Screen</Text>
-      </View>
-    );
-  }
-}
-
-const HomeStack = createStackNavigator({
-  Home: HomeScreen,
-  Categories: CategoriesScreen,
-  CategoryTests: CategoryTestScreen,
-  Test: TestScreen,
-  Quiz: QuizScreen,
-  Review: ReviewScreen,
-  QuestionBank: QuestionBankScreen,
-  Statistics: StatisticsScreen,
-  BuyProducts: BuyProductScreen,
+var { height, width } = Dimensions.get('window');
+EStyleSheet.build({ // always call EStyleSheet.build() even if you don't use global variables!
+    $rem: width / 380,
+    $restore_padding: height > 800 ? '15rem' : 0,
+    $restore_top_padding: height > 800 ? '10rem' : 0,
 });
+var db = openDatabase({ name: 'mydb.db', createFromLocation: 1, location: 'Documents' });
 
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
-  Profile: ProfileScreen,
-});
+library.add(fab, far, faExclamationCircle, faCog, faLayerGroup, faLock, faStar, faHome, faTimesCircle, fas, faTimes, faChevronCircleLeft, faCheckSquare, faCoffee, faCheckCircle, faChevronRight, faCircle, faDotCircle)
 
-const TabNavigator = createBottomTabNavigator({
-  Home: HomeStack,
-  Settings: SettingsStack,
-});
+global.premium = 0
+global.free_tests = 10
 
-// const AppContainer = createAppContainer(TabNavigator);
+new Promise((resolve, reject) => {
+    db.transaction(function (txn) {
+        txn.executeSql(
+            'SELECT * FROM config',
+            [],
+            (txn, results) => {
+                resolve(results.rows.item(0))
+            });
+    }, null, null);
+}).then((data) => {
+    console.log('version: ', data)
+    global.premium = data.full_version
+    global.free_tests = data.free_tests
+})
 
-export default createAppContainer(TabNavigator);
-
-// export default class App extends React.Component {
-//   render() {
-//     return <AppContainer />;
-//   }
-// }
+export default AppMain;
