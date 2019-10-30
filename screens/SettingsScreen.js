@@ -54,61 +54,33 @@ export default class SettingsScreen extends React.Component {
 
     getPurchases = async () => {
         try {
-            const purchases = await RNIap.getAvailablePurchases();
-            let restoredTitles = [];
-
-            purchases.forEach(purchase => {
-                switch (purchase.productId) {
-                    case '1':
-                        db.transaction(function (txn) {
-                            txn.executeSql(
-                                'UPDATE config SET full_version=1', []
-                            );
-                        })
-                        restoredTitles.push('Full Version');
-                }
-            })
-            if (restoredTitles.length > 0) {
+          const purchases = await RNIap.getAvailablePurchases();
+          let restoredTitles = [];
+    
+          purchases.forEach(purchase => {
+            switch (purchase.productId) {
+              case '1':
+                db.transaction(function (txn) {
+                  txn.executeSql(
+                    'UPDATE config SET full_version=1', []
+                  );
+                })
+                restoredTitles.push('Full Version');
                 global.premium = 1
                 emitter.emit('update_tests', '');
-                Alert.alert('Restore Successful', 'You successfully restored the following purchase: ' + restoredTitles.join(', '));
+                Alert.alert('Restore Successful', 'You successfully restored the full version');
+                break
+    
+              default:
+                Alert.alert('Error', "Nothing to Restore.")
             }
-            else {
-                Alert.alert('Nothing to Restore')
-            }
-
+          })
         } catch (err) {
-            Alert.alert('Error', "Can't connect to iTunes. Please check your internet connection and restart the app.")
+          Alert.alert('Error', "Can't connect to iTunes. Please check your credentials and internet connection.")
         } finally {
-            that.setState({ loading: false });
+          that.setState({ loading: false });
         }
-    }
-
-    // Test Buttons (Remove Later)
-    version0() {
-        db.transaction(function (txn) {
-            txn.executeSql(
-                'UPDATE config SET full_version=0',
-                []
-            )
-        })
-        console.log('Updated to version 0')
-        global.premium = 0
-        emitter.emit('update_tests', '');
-    }
-    version1() {
-        db.transaction(function (txn) {
-            txn.executeSql(
-                'UPDATE config SET full_version=1',
-                []
-            )
-            console.log('Updated to version 1')
-
-        })
-        global.premium = 1
-        emitter.emit('update_tests', '');
-    }
-    // Remove above ^^
+      }
 
     go_to_url(url) {
         Linking.canOpenURL(url).then((supported) => {
@@ -159,8 +131,7 @@ export default class SettingsScreen extends React.Component {
             <SettingsButton title='Privacy Policy' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/privacy-policy/')} />
             <SettingsButton title='F.A.Q' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/about-the-test/')} />
             <SettingsButton title='More Resources' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/study-guide/')} />
-            {/* <Button onPress={() => this.version0()} title='Set Version 0' />
-            <Button onPress={() => this.version1()} title='Set Version 1' /> */}
+            <SettingsButton title='Contact Us' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/contact/')} />
             {this.state.loading &&
                 <View style={styles.loader}>
                     <ActivityIndicator size='large' />

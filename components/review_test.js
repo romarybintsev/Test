@@ -12,8 +12,11 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 // Variables
 
 var { height, width } = Dimensions.get('window');
-if (height > 667) {
+if (height > 736) {
   REVIEW_MAX_HEIGHT = height / 2
+}
+else if (height > 667 && height <= 736){
+  REVIEW_MAX_HEIGHT = height / 1.8
 }
 else {
   REVIEW_MAX_HEIGHT = height / 1.9
@@ -153,7 +156,7 @@ export class ReviewTest extends React.Component {
                 <VictoryPie
                   {...sharedProps}
                   data={defaultData}
-                  innerRadius={EStyleSheet.value('65rem')}
+                  innerRadius={EStyleSheet.value('69rem')}
                   style={{
                     data: { fill: "gray", opacity: d => 0.3 }
                   }}
@@ -162,7 +165,7 @@ export class ReviewTest extends React.Component {
                   {...sharedProps}
                   animate={{ duration: 1000 }}
                   data={this.state.data}
-                  innerRadius={EStyleSheet.value('65rem')}
+                  innerRadius={EStyleSheet.value('69rem')}
                   cornerRadius={({ datum }) => {
                     if (datum.x == 1) {
                       return 25

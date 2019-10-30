@@ -87,6 +87,8 @@ PODS:
     - React
   - RNIap (3.5.5):
     - React
+  - RNRate (1.1.10):
+    - React
   - RNReanimated (1.3.0):
     - React
   - RNScreens (1.0.0-alpha.23):
@@ -120,6 +122,7 @@ DEPENDENCIES:
   - React-RCTWebSocket (from `../node_modules/react-native/Libraries/WebSocket`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNIap (from `../node_modules/react-native-iap`)
+  - RNRate (from `../node_modules/react-native-rate`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -178,6 +181,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNIap:
     :path: "../node_modules/react-native-iap"
+  RNRate:
+    :path: "../node_modules/react-native-rate"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -213,11 +218,12 @@ SPEC CHECKSUMS:
   React-RCTWebSocket: 2e7f6e98fd6d2bf447d145e499c3a235cc13e350
   RNGestureHandler: 311e3b1cef021a7c9ef31e97e7dc31970cc6288d
   RNIap: 8050b47307ff76a62cf9bf19e9602406e268dce0
+  RNRate: 9bbaa1e3f3043b1a7506e31e99ff19098a2b9079
   RNReanimated: 9f7976535c5cde50189acd84751871f5414190b9
   RNScreens: 354046589421edc3d83d5c6212475bf1fb9a731d
   RNSVG: 2e097b92aaa6d4e0f354fd7c49cbf3b17f8b3920
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 
-PODFILE CHECKSUM: 11107add6d5f1d32e011b2f247a8c12cf5572277
+PODFILE CHECKSUM: fb7174c1da51532e5f789de3ade3bce66a5607da
 
 COCOAPODS: 1.5.3

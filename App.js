@@ -14,7 +14,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 var { height, width } = Dimensions.get('window');
 EStyleSheet.build({ // always call EStyleSheet.build() even if you don't use global variables!
-    $rem: width / 380,
+    $rem: height < 1024 ? width / 380 : width /720,
     $restore_padding: height > 800 ? '15rem' : 0,
     $restore_top_padding: height > 800 ? '10rem' : 0,
 });

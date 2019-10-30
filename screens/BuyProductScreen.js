@@ -1,12 +1,13 @@
 // Imports
 
 import React from 'react';
-import { Alert, Platform, StyleSheet, Text, View, StatusBar, ActivityIndicator, TouchableWithoutFeedback, Linking, Dimensions, } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, View, StatusBar, ActivityIndicator, TouchableWithoutFeedback, Dimensions, } from 'react-native';
 import RNIap, { acknowledgePurchaseAndroid, purchaseErrorListener, purchaseUpdatedListener, } from 'react-native-iap';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import LinearGradient from 'react-native-linear-gradient';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { openDatabase } from 'react-native-sqlite-storage';
+import Rate, { AndroidMarket } from 'react-native-rate';
 
 // Variables
 
@@ -63,35 +64,37 @@ export default class BuyProductScreen extends React.Component {
       tabBarVisible: false,
     };
   };
-
-  // Handle urls
-  go_to_url(url) {
-    Linking.canOpenURL(url).then((supported) => {
-      if (!supported) {
-        console.log("Can't handle url: " + url);
-      } else {
-        return Linking.openURL(url);
-      }
-    })
-      .catch((err) => console.error('An error occurred', err));
-  }
+  that = this;
 
   // Review - First go to review page, then after 5 seconds set free_tests available to 15
   //          as global variable and in database
   review_button() {
-    that.go_to_url('https://lifeintheuktests.co.uk/terms-and-conditions/')
-    setTimeout(() => {
-      db.transaction(function (txn) {
-        txn.executeSql(
-          'UPDATE config SET free_tests=15', []
-        );
+      const options = {
+        AppleAppID:"1481724919",
+        GooglePackageName:"",
+        AmazonPackageName:"",
+        OtherAndroidURL:"",
+        preferredAndroidMarket: AndroidMarket.Google,
+        preferInApp:true,
+        openAppStoreIfInAppFails:true,
+        fallbackPlatformURL:"",
+      }
+      Rate.rate(options, success=>{
+        if (success) {
+          // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
+          db.transaction(function (txn) {
+            txn.executeSql(
+              'UPDATE config SET free_tests=15', []
+            );
+          })
+          global.free_tests = 15
+          setTimeout(() => 
+          that.setState({
+            reviewed: true,
+          }), 5000)
+        }
       })
-      global.free_tests = 15
-      that.setState({
-        reviewed: true,
-      })
-    }, 5000);
-  }
+    }
 
   // Set loader, find products and cancel loader after
   async componentDidMount() {
@@ -162,7 +165,6 @@ export default class BuyProductScreen extends React.Component {
   getPurchases = async () => {
     try {
       const purchases = await RNIap.getAvailablePurchases();
-      let restoredTitles = [];
 
       purchases.forEach(purchase => {
         switch (purchase.productId) {
@@ -172,20 +174,17 @@ export default class BuyProductScreen extends React.Component {
                 'UPDATE config SET full_version=1', []
               );
             })
-            restoredTitles.push('Full Version');
+            global.premium = 1
+            emitter.emit('update_tests', '');
+            Alert.alert('Restore Successful', 'You successfully restored the full version');
+            break
+
+          default:
+            Alert.alert('Error', "Nothing to Restore.")
         }
       })
-      if (restoredTitles.length > 0) {
-        global.premium = 1
-        emitter.emit('update_tests', '');
-        Alert.alert('Restore Successful', 'You successfully restored the following purchase: ' + restoredTitles.join(', '));
-      }
-      else {
-        Alert.alert('Nothing to Restore')
-      }
-
     } catch (err) {
-      Alert.alert('Error', "Can't connect to iTunes. Please check your internet connection and restart the app.")
+      Alert.alert('Error', "Can't connect to iTunes. Please check your credentials and internet connection.")
     } finally {
       that.setState({ loading: false });
     }

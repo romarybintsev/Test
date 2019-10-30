@@ -11,7 +11,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 var { height, width } = Dimensions.get('window');
 if (height > 667) {
   HEADER_MAX_HEIGHT = height / 3
-  HEADER_MIN_HEIGHT = height / 12
+  HEADER_MIN_HEIGHT = height / 8
 }
 else {
   HEADER_MAX_HEIGHT = height / 2.5
@@ -115,14 +115,13 @@ export class TestsList extends Component {
           height: headerHeight,
         }}>
 
-          <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1 }}>
+          <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1, alignItems: 'center' }}>
             <Animated.View style={[styles.test_completed_view, { marginTop: testcompletedHeight }]}>
               <Image style={styles.image} source={require('../assets/img/medal.png')} />
               <Animated.View style={{ marginTop: EStyleSheet.value('-10rem') }}>
                 <Text style={styles.main_view_text}>Tests Completed</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={styles.bar_text}>0</Text>
-                  <Text style={styles.bar_text}>{data.length}</Text>
+                <View style={{ alignItems:'center' }}>
+                  <Text style={styles.bar_text}>{number_completed} of {data.length} completed</Text>
                 </View>
                 <ProgressViewIOS style={{ transform: [{ scaleX: 1.0 }, { scaleY: 2.5 }], }} progress={number_completed_percent} progressTintColor={'orange'} trackTintColor={'gray'} />
               </Animated.View>
@@ -199,7 +198,7 @@ const styles = EStyleSheet.create({
     fontFamily: 'Nunito-Regular',
     zIndex: 10,
     color: 'white',
-    marginTop: '35rem',
+    marginTop: HEADER_MIN_HEIGHT - 40,
     fontSize: '20rem',
     alignSelf: 'center',
   },
@@ -207,6 +206,7 @@ const styles = EStyleSheet.create({
     color: 'white',
     fontFamily: 'Nunito-Light',
     fontSize: '12rem',
+    marginBottom: '5rem',
   },
   tab_view: {
     alignSelf: 'center',
@@ -228,6 +228,7 @@ const styles = EStyleSheet.create({
     alignSelf: 'center',
     width: '60rem',
     height: '60rem',
+    marginRight: '20rem'
   },
   percent_tab: {
     position: 'absolute',
@@ -250,7 +251,6 @@ const styles = EStyleSheet.create({
   },
   test_completed_view: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginLeft: '30rem',
     marginRight: '30rem',
   }

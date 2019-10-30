@@ -96,7 +96,6 @@ export default class HomeScreen extends React.Component {
           [],
           (txn, results) => {
             var q_len = results.rows.length;
-            console.log('hello', q_len)
             that.setState({
               question_bank_len: q_len,
             })
@@ -117,7 +116,7 @@ export default class HomeScreen extends React.Component {
       const receiptBody = {
         'receipt-data': receipt
       };
-      const validation = await RNIap.validateReceiptIos(receiptBody, true); // true = sandbox
+      const validation = await RNIap.validateReceiptIos(receiptBody, false); // true = sandbox
       if (receipt && validation.status == 0) {
         // Set Full version in DB to 1
         new Promise((resolve, reject) => {
@@ -197,7 +196,7 @@ export default class HomeScreen extends React.Component {
             {premium == 0 ? <HomeCard navigate_to={() => this.props.navigation.navigate('BuyProducts')} title='Premium' second_text='Unlock all tests and more' /> : null}
             <HomeCard navigate_to={() => this.props.navigation.navigate('Settings')} title='Settings' second_text='Additional Resources' />
           </View>
-          <Image style={{ alignSelf: 'center', width: width, height: EStyleSheet.value('150rem'), position: 'absolute', bottom: 0, opacity: 0.2, }} source={require('../assets/img/home.png')} />
+          <Image style={{ alignSelf: 'center', width: width, height: width/2.5, position: 'absolute', bottom: 0, opacity: 0.2, }} source={require('../assets/img/home.png')} />
         </LinearGradient>
       </View>
     );
