@@ -128,7 +128,7 @@ export default class TestScreen extends React.Component {
     if (this.state.correctoption.length == 1 && this.state.answered == false) {
       btn_color = 'white'
       icon_name = 'circle'
-      fill_color = 'rgb(200,200,200)'
+      fill_color = 'white'
     }
     else if (this.state.correctoption.length > 1 && this.state.answered == false) {
       if (this.state.select_options.includes(k)) {
@@ -139,7 +139,7 @@ export default class TestScreen extends React.Component {
       else {
         btn_color = 'white'
         icon_name = 'circle'
-        fill_color = 'rgb(200,200,200)'
+        fill_color = 'white'
       }
     }
     else {
@@ -157,7 +157,7 @@ export default class TestScreen extends React.Component {
         else {
           btn_color = 'white'
           icon_name = 'circle'
-          fill_color = 'rgb(200,200,200)'
+          fill_color = 'white'
         }
       }
       else {
@@ -174,7 +174,7 @@ export default class TestScreen extends React.Component {
         else {
           btn_color = 'white'
           icon_name = 'circle'
-          fill_color = 'rgb(200,200,200)'
+          fill_color = 'white'
         }
       }
     }
@@ -252,15 +252,13 @@ export default class TestScreen extends React.Component {
               <View style={{ flex: 1 }}>
                 <Text style={styles.list_title}>{currentOptions[k]}</Text>
               </View>
-              <View style={{ flex: 0, alignSelf: 'center' }}>
-                <FontAwesomeIcon style={{
-                  marginLeft: 8,
+              <View style={{ flex: 0, marginLeft: 8,alignSelf: 'center', backgroundColor:'white',}}>
+                <FontAwesomeIcon style= { Platform.OS === 'android' ? {borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}:{
                   shadowColor: '#000',
                   shadowOffset: { width: 0, height: 1 },
                   shadowOpacity: 0.2,
                   shadowRadius: 2,
-                  elevation: 5,
-                }} size={28} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
+                }} size={EStyleSheet.value('28rem')} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -276,15 +274,13 @@ export default class TestScreen extends React.Component {
               <View style={{ flex: 1 }}>
                 <Text style={styles.list_title}>{currentOptions[k]}</Text>
               </View>
-              <View style={{ flex: 0, alignSelf: 'center' }}>
-                <FontAwesomeIcon style={{
-                  marginLeft: 8,
+              <View style={{ flex: 0, marginLeft: 8,alignSelf: 'center', backgroundColor:'white'}}>
+                <FontAwesomeIcon style= { Platform.OS === 'android' ? {borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}:{
                   shadowColor: '#000',
                   shadowOffset: { width: 0, height: 1 },
                   shadowOpacity: 0.2,
                   shadowRadius: 2,
-                  elevation: 5,
-                }} size={28} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
+                }} size={EStyleSheet.value('28rem')} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -299,15 +295,13 @@ export default class TestScreen extends React.Component {
           <View style={{ flex: 1 }}>
             <Text style={styles.list_title}>{currentOptions[k]} </Text>
           </View>
-          <View style={{ flex: 0, alignSelf: 'center' }}>
-            <FontAwesomeIcon style={{
-              marginLeft: 8,
+          <View style={{ flex: 0, marginLeft: 8,alignSelf: 'center', backgroundColor:'white'}}>
+            <FontAwesomeIcon style= { Platform.OS === 'android' ? {borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}:{
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.2,
               shadowRadius: 2,
-              elevation: 5,
-            }} size={28} color={'#4AB027'} icon={'check-circle'} />
+            }} size={EStyleSheet.value('28rem')} color={'#4AB027'} icon={'check-circle'} />
           </View>
         </View>
       )
@@ -328,7 +322,7 @@ export default class TestScreen extends React.Component {
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           {this.state.expl_hidden ?
-            <View style={{ marginTop: QUESTION_MAX_HEIGHT }}>
+            <View style={{ paddingBottom: EStyleSheet.value('20rem'), marginTop: QUESTION_MAX_HEIGHT }}>
               {this.state.correctoption.length == 1 ? options : multiple_options}
             </View> :
             <View style={{ marginTop: QUESTION_MAX_HEIGHT }}>
@@ -394,7 +388,7 @@ const styles = EStyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 5,
+    elevation: 2,
     marginTop: '5rem',
     marginLeft: '10rem',
     marginRight: '10rem',
@@ -410,7 +404,7 @@ const styles = EStyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 5,
+    elevation: 2,
     marginTop: 5,
     marginLeft: '10rem',
     marginRight: '10rem',
@@ -438,7 +432,6 @@ const styles = EStyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: '#396AFC',
     borderWidth: 1,
-    marginTop: '20rem',
     marginLeft: '10rem',
     marginRight: '10rem',
   },

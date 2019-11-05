@@ -13,6 +13,7 @@ import QuizScreen from '../screens/QuizScreen';
 import QuestionBankScreen from '../screens/QuestionBankScreen';
 import BuyProductScreen from '../screens/BuyProductScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import RewardScreen from '../screens/RewardScreen';
 
 // Stacks
 
@@ -27,8 +28,11 @@ const HomeStack = createStackNavigator({
   BuyProducts: {
     screen: BuyProductScreen,
   },
-  QuestionBank: QuestionBankScreen,
+  QuestionBank: {
+    screen: QuestionBankScreen,
+  },
 }, {
+  headerLayoutPreset: 'center',
   navigationOptions: ({ navigation }) => ({
     tabBarVisible: navigation.state.index < 1,
     //   tabBarVisible: navigation.state.routes[navigation.state.index].routeName == 'Home'
@@ -43,6 +47,9 @@ const TestsStack = createStackNavigator({
       headerTransparent: true,
     }),
   },
+  Rewards: {
+    screen: RewardScreen,
+  },
   Test: {
     screen: TestScreen,
   },
@@ -51,12 +58,15 @@ const TestsStack = createStackNavigator({
   },
 }, {
   navigationOptions: ({ navigation }) => ({
-    tabBarVisible: navigation.state.routes[navigation.state.index].routeName != 'Quiz',
-  })
+    tabBarVisible: navigation.state.routes[navigation.state.index].routeName == 'CategoryTests',
+  }),
+  headerLayoutPreset: 'center',
 })
 
 const SettingsStack = createStackNavigator({
   Settings: SettingsScreen,
+}, {
+  headerLayoutPreset: 'center',
 });
 
 

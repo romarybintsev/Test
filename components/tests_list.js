@@ -1,7 +1,7 @@
 // Imports
 
 import React, { Component } from 'react';
-import { StatusBar, Image, Dimensions, ProgressViewIOS, TouchableWithoutFeedback, FlatList, StyleSheet, Text, View, Button, Animated } from 'react-native';
+import { ProgressBarAndroid, StatusBar, Image, Dimensions, ProgressViewIOS, TouchableWithoutFeedback, FlatList, StyleSheet, Text, View, Button, Animated } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import LinearGradient from 'react-native-linear-gradient';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -11,11 +11,11 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 var { height, width } = Dimensions.get('window');
 if (height > 667) {
   HEADER_MAX_HEIGHT = height / 3
-  HEADER_MIN_HEIGHT = height / 8
+  HEADER_MIN_HEIGHT = Platform.OS === 'ios' ? height / 8 : height/10
 }
 else {
   HEADER_MAX_HEIGHT = height / 2.5
-  HEADER_MIN_HEIGHT = height / 8
+  HEADER_MIN_HEIGHT = Platform.OS === 'ios' ? height / 8 : height/10
 }
 
 // Tests List
@@ -123,7 +123,12 @@ export class TestsList extends Component {
                 <View style={{ alignItems:'center' }}>
                   <Text style={styles.bar_text}>{number_completed} of {data.length} completed</Text>
                 </View>
+                {Platform.OS === 'ios' ?
                 <ProgressViewIOS style={{ transform: [{ scaleX: 1.0 }, { scaleY: 2.5 }], }} progress={number_completed_percent} progressTintColor={'orange'} trackTintColor={'gray'} />
+                :
+                <ProgressBarAndroid styleAttr="Horizontal" indeterminate={false} color={'orange'} progress={number_completed_percent} /> }
+
+
               </Animated.View>
             </Animated.View>
           </LinearGradient>
@@ -135,7 +140,7 @@ export class TestsList extends Component {
         </Animated.View>
         <Animated.FlatList
           overScrollMode={'never'}
-          style={{ flex: 1, marginTop: listHeight }}
+          style={{ flex: 1, marginTop: listHeight, backgroundColor:'#E8E8E8' }}
           contentContainerStyle={{ paddingBottom: EStyleSheet.value('20rem') }}
           scrollEventThrottle={16}
           onScroll={Animated.event(
@@ -143,7 +148,7 @@ export class TestsList extends Component {
           )}
           data={data}
           renderItem={({ item }) =>
-            <TouchableWithoutFeedback style={styles.list_item} onPress={() => item.id <= free_tests || premium == 1 ? this.props.navigation.navigate('Quiz', { test_id: item.id, test_name: item.name }) : this.props.navigation.navigate('BuyProducts')}>
+            <TouchableWithoutFeedback style={styles.list_item} onPress={() => item.id <= free_tests || premium == 1 ? this.props.navigation.navigate('Quiz', { test_id: item.id, test_name: item.name }) : this.props.navigation.navigate('Rewards')}>
               <View style={styles.list_title_view}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.list_title}>{item.name}</Text>
@@ -172,7 +177,7 @@ const styles = EStyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 5,
+    elevation: 2,
     marginTop: '5rem',
     marginLeft: '15rem',
     marginRight: '15rem',

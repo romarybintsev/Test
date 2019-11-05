@@ -6,11 +6,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { openDatabase } from 'react-native-sqlite-storage';
 import RNIap from 'react-native-iap';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import Rate, { AndroidMarket } from 'react-native-rate';
 
 // Variables
 
 var emitter = require('tiny-emitter/instance');
 var db = openDatabase({ name: 'mydb.db', createFromLocation: 1, location: 'Documents' });
+if (Platform.OS === 'ios') {
+    storeName = 'iTunes'
+  }
+  else if (Platform.OS === 'android') {
+    storeName = 'Google Play'
+  }
 
 // Settings Button (takes prop 'title + on_press_fucntion')
 
@@ -56,7 +63,7 @@ export default class SettingsScreen extends React.Component {
         try {
           const purchases = await RNIap.getAvailablePurchases();
           let restoredTitles = [];
-    
+          if(purchases.length > 0) {
           purchases.forEach(purchase => {
             switch (purchase.productId) {
               case '1':
@@ -75,11 +82,32 @@ export default class SettingsScreen extends React.Component {
                 Alert.alert('Error', "Nothing to Restore.")
             }
           })
+        } else {
+            Alert.alert('Error', "Nothing to Restore.")
+        }
         } catch (err) {
-          Alert.alert('Error', "Can't connect to iTunes. Please check your credentials and internet connection.")
+            Alert.alert("Can't connect to " + storeName + ". Please check your credentials and internet connection.")
         } finally {
           that.setState({ loading: false });
         }
+      }
+
+      review_button() {
+        const options = {
+          AppleAppID:"1481724919",
+          GooglePackageName:"uk.lifeintheuktest",
+          AmazonPackageName:"",
+          OtherAndroidURL:"",
+          preferredAndroidMarket: AndroidMarket.Google,
+          preferInApp:false,
+          openAppStoreIfInAppFails:true,
+          fallbackPlatformURL:"",
+        }
+        Rate.rate(options, success=>{
+          if (success) {
+            // Do smth on success
+          }
+        })
       }
 
     go_to_url(url) {
@@ -127,9 +155,7 @@ export default class SettingsScreen extends React.Component {
                 this.getPurchases()
             }} />
             <Text style={styles.title}>OTHER</Text>
-            <SettingsButton title='Terms and Conditions' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/terms-and-conditions/')} />
-            <SettingsButton title='Privacy Policy' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/privacy-policy/')} />
-            <SettingsButton title='F.A.Q' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/about-the-test/')} />
+            <SettingsButton title='Rate Us' on_press_fun={() => this.review_button()} />
             <SettingsButton title='More Resources' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/study-guide/')} />
             <SettingsButton title='Contact Us' on_press_fun={() => this.go_to_url('https://lifeintheuktests.co.uk/contact/')} />
             {this.state.loading &&
@@ -157,7 +183,6 @@ const styles = EStyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-        elevation: 5,
         marginTop: '5rem',
         borderRadius: 10,
         paddingLeft: '15rem',
@@ -178,7 +203,8 @@ const styles = EStyleSheet.create({
         opacity: 0.5,
         backgroundColor: 'black',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        zIndex: 99999,
     },
     header_text: {
         color: 'white',

@@ -18,12 +18,21 @@ const itemSkus = Platform.select({
   ios: [
     '1',
   ],
-  android: [],
+  android: [
+    '1',
+  ],
 });
 const itemSubs = Platform.select({
   ios: [],
   android: [],
 });
+
+if (Platform.OS === 'ios') {
+  storeName = 'iTunes'
+}
+else if (Platform.OS === 'android') {
+  storeName = 'Google Play'
+}
 
 // Premium Text Class (takes prop 'text')
 
@@ -48,7 +57,6 @@ export default class BuyProductScreen extends React.Component {
       receipt: '',
       availableItemsMessage: '',
       loading: true,
-      reviewed: false,
     };
     that = this;
   }
@@ -66,41 +74,9 @@ export default class BuyProductScreen extends React.Component {
   };
   that = this;
 
-  // Review - First go to review page, then after 5 seconds set free_tests available to 15
-  //          as global variable and in database
-  review_button() {
-      const options = {
-        AppleAppID:"1481724919",
-        GooglePackageName:"",
-        AmazonPackageName:"",
-        OtherAndroidURL:"",
-        preferredAndroidMarket: AndroidMarket.Google,
-        preferInApp:true,
-        openAppStoreIfInAppFails:true,
-        fallbackPlatformURL:"",
-      }
-      Rate.rate(options, success=>{
-        if (success) {
-          // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
-          db.transaction(function (txn) {
-            txn.executeSql(
-              'UPDATE config SET free_tests=15', []
-            );
-          })
-          global.free_tests = 15
-          setTimeout(() => 
-          that.setState({
-            reviewed: true,
-          }), 5000)
-        }
-      })
-    }
-
   // Set loader, find products and cancel loader after
   async componentDidMount() {
-    if (free_tests == 15) {
-      that.setState({ reviewed: true })
-    }
+
     emitter.on('stop_loader', function () {
       that.setState({ loading: false })
     });
@@ -109,7 +85,7 @@ export default class BuyProductScreen extends React.Component {
       // const products = await RNIap.getSubscriptions(itemSkus);
       that.setState({ productList: products });
     } catch (err) {
-      Alert.alert('Error', "Can't connect to iTunes. Please check your internet connection and restart the app.")
+      Alert.alert("Can't connect to " + storeName + ". Please check your internet connection and restart the app.")
     } finally {
       that.setState({ loading: false })
     }
@@ -128,9 +104,9 @@ export default class BuyProductScreen extends React.Component {
     }
     else {
       try {
-        RNIap.requestPurchase(sku, dangerous);
+        await RNIap.requestPurchase(sku, dangerous);
       } catch (err) {
-        Alert.alert("Can't connect to iTunes. Please check your internet connection and restart the app.")
+        Alert.alert("Can't connect to " + storeName + ". Please check your internet connection and restart the app.")
         console.warn(err.code, err.message);
       } finally {
         that.setState({ loading: false, })
@@ -165,6 +141,7 @@ export default class BuyProductScreen extends React.Component {
   getPurchases = async () => {
     try {
       const purchases = await RNIap.getAvailablePurchases();
+      if(purchases.length > 0) {
 
       purchases.forEach(purchase => {
         switch (purchase.productId) {
@@ -183,8 +160,12 @@ export default class BuyProductScreen extends React.Component {
             Alert.alert('Error', "Nothing to Restore.")
         }
       })
+    }
+    else{
+      Alert.alert('Error', "Nothing to Restore.")
+    }
     } catch (err) {
-      Alert.alert('Error', "Can't connect to iTunes. Please check your credentials and internet connection.")
+      Alert.alert("Can't connect to " + storeName + ". Please check your credentials and internet connection.")
     } finally {
       that.setState({ loading: false });
     }
@@ -194,7 +175,7 @@ export default class BuyProductScreen extends React.Component {
     that = this;
 
     function review_icon() {
-      if (that.state.reviewed == false) {
+      if (reviewed == 0) {
         icon = 'circle'
         color = 'white'
       }
@@ -244,21 +225,15 @@ export default class BuyProductScreen extends React.Component {
 
           <View style={styles.premium_text_view}>
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
-              <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Want more tests without premium? Leave us a review and unlock 5 more tests.</Text>
+              <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Want more tests for free?</Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => !this.state.reviewed ? that.review_button() : null}>
+            <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Rewards')}>
               <View style={styles.review_option}>
                 <View style={{ alignSelf: 'center' }}>
-                  <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Leave a Review</Text>
+                  <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Unlock more tests</Text>
                 </View>
                 <View style={{ flex: 0, alignSelf: 'center' }}>
-                  <FontAwesomeIcon style={this.state.reviewed ? {} : {
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 2,
-                    elevation: 5,
-                  }} size={EStyleSheet.value('28rem')} icon={review_icon().icon} fill={review_icon().color} />
+                  <FontAwesomeIcon size={EStyleSheet.value('28rem')} icon={'chevron-right'} fill={'#E8E8E8'} />
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -331,7 +306,7 @@ const styles = EStyleSheet.create({
     color: 'white',
     fontSize: '17rem',
     textAlign: 'center',
-    maxWidth: '350rem',
+    maxWidth: '355rem',
     marginTop: '5rem',
     paddingTop: '$restore_top_padding',
   },
@@ -375,7 +350,6 @@ const styles = EStyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 5,
     borderRadius: 10,
     paddingLeft: '15rem',
     paddingRight: '22rem',
@@ -405,6 +379,7 @@ const styles = EStyleSheet.create({
     opacity: 0.5,
     backgroundColor: 'black',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    zIndex: 99999,
   },
 });

@@ -3,10 +3,11 @@
 import React, { Component } from 'react';
 import TestScreen from './TestScreen';
 import { ReviewTest } from '../components/review_test';
-import { StyleSheet, View, Text, } from 'react-native';
+import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import EStyleSheet from 'react-native-extended-stylesheet';
+import { AdMobInterstitial} from 'react-native-admob';
 
 // Variables
 
@@ -81,18 +82,24 @@ export default class QuestionBankScreen extends Component {
     }
     static navigationOptions = ({ navigation, navigationOptions }) => {
         return {
-            title: 'Challenge Bank',
-            headerTintColor: 'white',
-            headerTransparent: true,
-            headerLeft: null,
-            headerRight: <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
-                <FontAwesomeIcon style={{ marginRight: 15, }} size={24} color={'white'} icon={'times-circle'} />
-            </TouchableWithoutFeedback>,
+          headerTintColor: 'white',
+          title: 'Challenge Bank',
+          headerTransparent: true,
+          headerLeft: null,
+          headerRight: <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
+            <FontAwesomeIcon style={{ marginRight: EStyleSheet.value('15rem'), }} size={EStyleSheet.value('24rem')} color={'white'} icon={'times-circle'} />
+          </TouchableWithoutFeedback>,
+          tabBarVisible: false,
         };
-    };
+      };
 
     _quizFinish(score, questions, users_ans, correct_ans) {
         this.setState({ quizFinish: true, score: score, questions: questions, users_ans: users_ans, correct_ans: correct_ans });
+        if(this.state.data.length > 5 && premium == 0) {
+            AdMobInterstitial.setAdUnitID('ca-app-pub-6187955227300148/9739823688');
+            AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
+            AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+        }
     }
 
     render() {

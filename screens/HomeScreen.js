@@ -16,6 +16,13 @@ var emitter = require('tiny-emitter/instance');
 let purchaseUpdateSubscription;
 let purchaseErrorSubscription;
 
+if (Platform.OS === 'ios') {
+  storeName = 'iTunes'
+}
+else if (Platform.OS === 'android') {
+  storeName = 'Google Play'
+}
+
 if (height > 667) {
   HEADER_MAX_HEIGHT = height / 3
   QUESTION_MAX_HEIGHT = height / 3
@@ -32,6 +39,9 @@ SELECT t1.* FROM questions as t1 Inner join latest_answer_per_question as t2 \
 ON t1.id = t2.question_id \
 AND t2.correct = 0';
 
+const accessToken = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAijPTCR2j1pTjn0Yd8NtJRiopTWgqym1gA6R/+t55oy9AoB550JqmT42KT20SlaVAWcBYPIGK5r6MugMVkR/ssW4tClWG/49FWtpbbEjkXE56qx6lyK4mdBJ9RAklhM+QdS61g+hZVWEznxel0Kcq4zaDzevU7CqDabPGMYsqxIgQ756IOGM5eaZeLu2shXmCcFp8Fzp1jf+x1oxvvU8ya8zM7a+iu3cQz+HW5Zp/lJQiXW1vDJgoV/lvsR6pXnoBFgHdjkVGPbQtK2laDZrkNf0CbE4M4iIcpiseQQUXndDsaKJThlRfLETVCVqD8h2gIn2xsXMurvJh4HhQFModRwIDAQAB';
+const packageName = 'uk.lifeintheuktest';
+const isSub = false;
 // Main Screen
 
 export default class HomeScreen extends React.Component {
@@ -113,11 +123,21 @@ export default class HomeScreen extends React.Component {
 
     purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
       const receipt = purchase.transactionReceipt;
-      const receiptBody = {
-        'receipt-data': receipt
-      };
-      const validation = await RNIap.validateReceiptIos(receiptBody, false); // true = sandbox
-      if (receipt && validation.status == 0) {
+      if (Platform.OS === 'ios') {
+        const receiptBody = {
+          'receipt-data': receipt
+        };
+        const validation = await RNIap.validateReceiptIos(receiptBody, false); // true = sandbox
+        if(receipt && validation.status == 0){
+          valid = true
+        }
+      }
+      else if (Platform.OS === 'android') {
+        if(receipt){
+          valid = true
+        }
+      }
+      if (valid) {
         // Set Full version in DB to 1
         new Promise((resolve, reject) => {
           db.transaction(function (txn) {
@@ -164,7 +184,7 @@ export default class HomeScreen extends React.Component {
     purchaseErrorSubscription = purchaseErrorListener((error) => {
       error_code = error['responseCode'];
       if (error_code == 0) {
-        Alert.alert('Error', 'Cannot connect to iTunes. Please check your internet connection.');
+        Alert.alert("Can't connect to " + storeName + ". Please check your internet connection and restart the app.")
       }
       emitter.emit('stop_loader', '');
     });
@@ -194,7 +214,7 @@ export default class HomeScreen extends React.Component {
             <HomeCard navigate_to={() => this.props.navigation.navigate('CategoryTests')} title='Practice Tests' second_text={this.state.num_completed + ' of ' + this.state.test_len + ' tests completed'} />
             <HomeCard navigate_to={() => this.props.navigation.navigate('QuestionBank')} title='Challenge Bank' second_text={this.state.question_bank_len + (this.state.question_bank_len == 1 ? ' question in the bank' : ' questions in the bank')} question_bank={this.state.question_bank_len} />
             {premium == 0 ? <HomeCard navigate_to={() => this.props.navigation.navigate('BuyProducts')} title='Premium' second_text='Unlock all tests and more' /> : null}
-            <HomeCard navigate_to={() => this.props.navigation.navigate('Settings')} title='Settings' second_text='Additional Resources' />
+            {premium == 0 ? <HomeCard navigate_to={() => this.props.navigation.navigate('Rewards')} title='Rewards' second_text='Unlock tests for free' /> : null}
           </View>
           <Image style={{ alignSelf: 'center', width: width, height: width/2.5, position: 'absolute', bottom: 0, opacity: 0.2, }} source={require('../assets/img/home.png')} />
         </LinearGradient>

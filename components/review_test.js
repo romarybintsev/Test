@@ -1,7 +1,7 @@
 // Imports
 
 import React from 'react';
-import { StatusBar, Dimensions, TouchableWithoutFeedback, Text, View, Animated } from 'react-native';
+import { StatusBar, Dimensions, TouchableWithoutFeedback, Text, View, Animated, FlatList } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import LinearGradient from 'react-native-linear-gradient';
 import { VictoryContainer, VictoryPie, VictoryLabel } from "victory-native";
@@ -13,15 +13,15 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 var { height, width } = Dimensions.get('window');
 if (height > 736) {
-  REVIEW_MAX_HEIGHT = height / 2
+  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 2 : height/2.3
 }
 else if (height > 667 && height <= 736){
-  REVIEW_MAX_HEIGHT = height / 1.8
+  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 1.8 : height/2
 }
 else {
-  REVIEW_MAX_HEIGHT = height / 1.9
+  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 1.9 : height/2
 }
-REVIEW_MIN_HEIGHT = height / 8
+REVIEW_MIN_HEIGHT =  Platform.OS === 'ios' ? height / 8 : height/11
 
 
 // Review Page
@@ -107,14 +107,9 @@ export class ReviewTest extends React.Component {
       outputRange: [REVIEW_MAX_HEIGHT, REVIEW_MIN_HEIGHT],
       extrapolate: 'clamp'
     })
-    const tabsHeight = this.state.scrollY.interpolate({
-      inputRange: [0, REVIEW_MAX_HEIGHT - REVIEW_MIN_HEIGHT],
-      outputRange: [REVIEW_MAX_HEIGHT + 15, REVIEW_MIN_HEIGHT + 15],
-      extrapolate: 'clamp'
-    })
     const listHeight = this.state.scrollY.interpolate({
       inputRange: [0, REVIEW_MAX_HEIGHT - REVIEW_MIN_HEIGHT],
-      outputRange: [REVIEW_MAX_HEIGHT + 70, REVIEW_MIN_HEIGHT + 35],
+      outputRange: [EStyleSheet.value('35rem'), EStyleSheet.value('-10rem')],
       extrapolate: 'clamp'
     })
 
@@ -130,7 +125,7 @@ export class ReviewTest extends React.Component {
     })
 
     return (
-      <View style={{ flex: 1, backgroundColor: '#E8E8E8', padding: 20, }}>
+      <View style={{ flex: 1, backgroundColor: '#E8E8E8',paddingLeft: 20, paddingRight: 20, paddingBottom: 20}}>
         <StatusBar barStyle="light-content" />
         <Animated.View style={{
           position: 'absolute',
@@ -138,11 +133,10 @@ export class ReviewTest extends React.Component {
           left: 0,
           right: 0,
           height: headerHeight,
-          zIndex: 5,
         }}>
 
           <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1 }}>
-            <View style={{ marginTop: REVIEW_MIN_HEIGHT }}>
+            <View style={{ marginTop: REVIEW_MIN_HEIGHT}}>
               <Text style={{ textAlign: 'center', fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), color: 'white' }}>Test Result</Text>
               <VictoryContainer width={EStyleSheet.value('250rem')} height={EStyleSheet.value('250rem')} style={{ alignSelf: 'center', marginTop: -35 }}>
                 <Defs>
@@ -156,7 +150,7 @@ export class ReviewTest extends React.Component {
                 <VictoryPie
                   {...sharedProps}
                   data={defaultData}
-                  innerRadius={EStyleSheet.value('69rem')}
+                  innerRadius={Platform.OS === 'ios' ? EStyleSheet.value('69rem'):EStyleSheet.value('60rem')}
                   style={{
                     data: { fill: "gray", opacity: d => 0.3 }
                   }}
@@ -165,7 +159,7 @@ export class ReviewTest extends React.Component {
                   {...sharedProps}
                   animate={{ duration: 1000 }}
                   data={this.state.data}
-                  innerRadius={EStyleSheet.value('69rem')}
+                  innerRadius={Platform.OS === 'ios' ? EStyleSheet.value('69rem'):EStyleSheet.value('60rem')}
                   cornerRadius={({ datum }) => {
                     if (datum.x == 1) {
                       return 25
@@ -199,28 +193,30 @@ export class ReviewTest extends React.Component {
           </LinearGradient>
         </Animated.View>
         <Animated.View style={{
-          marginTop: tabsHeight,
-          position: 'absolute',
+          marginTop: headerHeight,
+          backgroundColor: '#E8E8E8',
+          zIndex: 1000,
+          paddingBottom: EStyleSheet.value('50rem'),
+        }}>
+        <View style={{
           alignSelf: 'center',
           justifyContent: 'space-between',
           flexDirection: 'row',
+          marginTop: EStyleSheet.value('15rem'),
           marginLeft: EStyleSheet.value('10rem'),
           marginRight: EStyleSheet.value('10rem'),
-          borderColor: '#396afc',
-          borderWidth: 2,
-          borderRadius: 12,
-          zIndex: 1,
+          zIndex: 999,
         }}>
           <TouchableWithoutFeedback onPress={() => { this.setState({ all_questions: true }) }}>
-            <View style={[styles.view_tab_both, { backgroundColor: this.state.all_questions ? '#396afc' : '#E8E8E8', borderTopLeftRadius: 10, borderBottomLeftRadius: 10, }]}><Text style={[{ color: this.state.all_questions ? 'white' : '#396afc', }, styles.view_tab_text]}>All Questions</Text></View>
+            <View style={[styles.view_tab_both, { backgroundColor: this.state.all_questions ? '#396afc' : '#E8E8E8', borderTopLeftRadius: EStyleSheet.value('10rem'), borderBottomLeftRadius: EStyleSheet.value('10rem'), }]}><Text style={[{ color: this.state.all_questions ? 'white' : '#396afc', }, styles.view_tab_text]}>All Questions</Text></View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback onPress={() => { this.setState({ all_questions: false }) }}>
-            <View style={[styles.view_tab_both, { backgroundColor: !this.state.all_questions ? '#396afc' : '#E8E8E8', borderTopRightRadius: 10, borderBottomRightRadius: 10, }]}><Text style={[{ color: !this.state.all_questions ? 'white' : '#396afc' }, styles.view_tab_text]}>Incorrect</Text></View>
+            <View style={[styles.view_tab_both, { backgroundColor: !this.state.all_questions ? '#396afc' : '#E8E8E8', borderTopRightRadius: EStyleSheet.value('10rem'), borderBottomRightRadius: EStyleSheet.value('10rem'), }]}><Text style={[{ color: !this.state.all_questions ? 'white' : '#396afc' }, styles.view_tab_text]}>Incorrect</Text></View>
           </TouchableWithoutFeedback>
-        </Animated.View>
+        </View>
         <Animated.FlatList
           overScrollMode={'never'}
-          style={{ flex: 1, marginTop: listHeight, zIndex: 0, }}
+          style={{ marginTop: listHeight }}
           contentContainerStyle={{ paddingBottom: EStyleSheet.value('20rem') }}
           scrollEventThrottle={16}
           onScroll={Animated.event(
@@ -266,6 +262,7 @@ export class ReviewTest extends React.Component {
               </View>
             </View>}
         />
+        </Animated.View>
       </View>
     )
   }
@@ -281,7 +278,7 @@ const styles = EStyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 5,
+    elevation: 2,
     marginTop: '5rem',
     marginLeft: '10rem',
     marginRight: '10rem',
@@ -294,11 +291,13 @@ const styles = EStyleSheet.create({
     paddingTop: '12rem',
   },
   view_tab_both: {
-    flex: 1,
     paddingLeft: '15rem',
     paddingRight: '22rem',
     paddingTop: '12rem',
     paddingBottom: '12rem',
+    flex: 1,
+    borderWidth: 2,
+    borderColor:  '#396afc',
   },
   view_tab_text: {
     textAlign: 'center',

@@ -29,7 +29,7 @@ target 'Test' do
 
 
   
-  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
 
   target 'TestTests' do
     inherit! :search_paths

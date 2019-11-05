@@ -128,11 +128,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.test"
+        applicationId "uk.lifeintheuktest"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 9
+        versionName "1.09"
     }
     splits {
         abi {
@@ -191,6 +191,7 @@ dependencies {
     implementation project(':react-native-svg')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation project(':react-native-sqlite-storage')
 
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";
