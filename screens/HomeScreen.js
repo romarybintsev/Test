@@ -122,6 +122,7 @@ export default class HomeScreen extends React.Component {
     }
 
     purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
+      console.log('purchaseupdatelistener')
       const receipt = purchase.transactionReceipt;
       if (Platform.OS === 'ios') {
         const receiptBody = {
@@ -176,12 +177,13 @@ export default class HomeScreen extends React.Component {
             }
             global.premium = 1
             emitter.emit('update_tests', '');
-            emitter.emit('stop_loader', '');
           });
       }
+      emitter.emit('stop_loader', '');
     });
 
     purchaseErrorSubscription = purchaseErrorListener((error) => {
+      console.log('errorpurchaselistnere')
       error_code = error['responseCode'];
       if (error_code == 0) {
         Alert.alert("Can't connect to " + storeName + ". Please check your internet connection and restart the app.")
