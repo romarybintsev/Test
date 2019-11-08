@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Platform, StyleSheet, Text, View, StatusBar, ActivityIndicator, TouchableWithoutFeedback, Dimensions, TextInput } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, View, StatusBar, ActivityIndicator, TouchableWithoutFeedback, Dimensions, TextInput, KeyboardAvoidingView } from 'react-native';
 import RNIap, { acknowledgePurchaseAndroid, purchaseErrorListener, purchaseUpdatedListener, } from 'react-native-iap';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import LinearGradient from 'react-native-linear-gradient';
@@ -72,11 +72,11 @@ export default class RewardScreen extends React.Component {
       }
     })
   }
-  todays_pin(){
+todays_pin(){
     var today = new Date();
     var mm = String(today.getMonth() + 1).padStart(2, '0'); 
     var yyyy = today.getFullYear();
-    pin = '72' + yyyy + mm;
+    var pin = '72' + yyyy + mm;
     return pin
   }
 
@@ -130,8 +130,6 @@ export default class RewardScreen extends React.Component {
         AdMobRewarded.showAd().catch(error =>  Alert.alert('Error', 'Please wait for the ad to load.'));
     }
     render(){
-
-        that = this;
         return(
             <View style={{ flex: 1, backgroundColor: '#E8E8E8' }}>
 
@@ -144,13 +142,14 @@ export default class RewardScreen extends React.Component {
     
               </LinearGradient>
             </View>
+            <KeyboardAvoidingView behavior= {Platform.OS === 'ios' ? "position" : ""} enabled>
             <ScrollView style={{zIndex: 0}}>
             <View style={{marginTop: height/4, padding: EStyleSheet.value('20rem') }}>
             {reviewed == 0 ?<View style={styles.premium_text_view}>
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
               <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Leave us a review and unlock 5 more tests.</Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => reviewed == 0 ? that.review_button() : null}>
+            <TouchableWithoutFeedback onPress={() => this.review_button()}>
               <View style={styles.review_option}>
                 <View style={{ alignSelf: 'center' }}>
                   <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Leave a Review</Text>
@@ -171,7 +170,7 @@ export default class RewardScreen extends React.Component {
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
               <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Want even more tests? Unlock 1 test for each video watched.</Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => that.showRewarded()}>
+            <TouchableWithoutFeedback onPress={() => this.showRewarded()}>
               <View style={styles.review_option}>
                 <View style={{ alignSelf: 'center' }}>
                   <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Watch Now</Text>
@@ -203,10 +202,10 @@ export default class RewardScreen extends React.Component {
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
               <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Have a PIN? Enter it here.</Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => reviewed == 0 ? that.review_button() : null}>
               <View style={styles.pin_option}>
-                <View style={{ alignSelf: 'center' }}>
+                <View style={{ flex: 1, alignSelf: 'center' }}>
                 <TextInput
+                style={{color: 'black', opacity: 1,}}
                     placeholder="Enter your PIN"
                     onChangeText={(text) => this.setState({text})}
                     value={this.state.text}
@@ -220,10 +219,10 @@ export default class RewardScreen extends React.Component {
                 </View>
                 </View>
               </View>
-            </TouchableWithoutFeedback>
           </View>
           </View>
           </ScrollView>
+          </KeyboardAvoidingView>
             </View>
         )
     }
@@ -308,6 +307,8 @@ const styles = EStyleSheet.create({
         borderRadius: 10,
         paddingLeft: '15rem',
         paddingRight: '22rem',
+        paddingTop: '5rem',
+        paddingBottom: '5rem',
         marginTop: '10rem',
         marginBottom: '10rem',
       },
