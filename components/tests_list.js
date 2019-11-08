@@ -30,7 +30,6 @@ export class TestsList extends Component {
 
   }
   render() {
-    that = this;
     data = this.props.data;
     number_completed = 0
     for (let i = 0; i < data.length; i++) {
