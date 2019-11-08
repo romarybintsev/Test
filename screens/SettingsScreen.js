@@ -46,7 +46,6 @@ export default class SettingsScreen extends React.Component {
             loading: false,
         }
     }
-    that = this;
 
     static navigationOptions = ({ navigation, navigationOptions }) => {
         return {
@@ -88,7 +87,7 @@ export default class SettingsScreen extends React.Component {
         } catch (err) {
             Alert.alert("Can't connect to " + storeName + ". Please check your credentials and internet connection.")
         } finally {
-          that.setState({ loading: false });
+          this.setState({ loading: false });
         }
       }
 
@@ -146,7 +145,6 @@ export default class SettingsScreen extends React.Component {
         Alert.alert(title, message, buttons);
     }
     render() {
-        that = this;
         return (<View style={{ flex: 1, paddingLeft: EStyleSheet.value('20rem'), paddingRight: EStyleSheet.value('20rem'), backgroundColor: '#E8E8E8' }}>
             <Text style={styles.title}>MAIN SETTINGS</Text>
             <SettingsButton title='Reset Statistics' on_press_fun={() => this.promptUser()} />

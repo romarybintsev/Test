@@ -58,8 +58,8 @@ export default class BuyProductScreen extends React.Component {
       availableItemsMessage: '',
       loading: true,
     };
-    that = this;
   }
+  that = this;
   // Header Navigation Details
   static navigationOptions = ({ navigation, navigationOptions }) => {
     return {
@@ -72,22 +72,22 @@ export default class BuyProductScreen extends React.Component {
       tabBarVisible: false,
     };
   };
-  that = this;
+
 
   // Set loader, find products and cancel loader after
   async componentDidMount() {
-
+    that = this;
     emitter.on('stop_loader', function () {
-      that.setState({ loading: false })
+      that.setState({ loading: false,})
     });
     try {
       const products = await RNIap.getProducts(itemSkus);
       // const products = await RNIap.getSubscriptions(itemSkus);
-      that.setState({ productList: products });
+      this.setState({ productList: products });
     } catch (err) {
       Alert.alert("Can't connect to " + storeName + ". Please check your internet connection and restart the app.")
     } finally {
-      that.setState({ loading: false })
+      this.setState({ loading: false })
     }
 
   }
@@ -109,13 +109,13 @@ export default class BuyProductScreen extends React.Component {
         Alert.alert("Can't connect to " + storeName + ". Please check your internet connection and restart the app.")
         console.warn(err.code, err.message);
       } finally {
-        that.setState({ loading: false, })
+        that.setState({ loading: false })
       }
     }
   };
 
   startPurchase(sku) {
-    that.setState({ loading: true })
+    this.setState({ loading: true })
     RNIap.requestPurchase(sku, false)
   }
 
@@ -172,22 +172,6 @@ export default class BuyProductScreen extends React.Component {
   }
   render() {
     const { productList, loading } = this.state;
-    that = this;
-
-    function review_icon() {
-      if (reviewed == 0) {
-        icon = 'circle'
-        color = 'white'
-      }
-      else {
-        icon = 'check-circle'
-        color = '#a8e063'
-      }
-      return {
-        icon: icon,
-        color: color,
-      }
-    }
 
     return (
       <View style={{ flex: 1, backgroundColor: '#E8E8E8' }}>
@@ -214,7 +198,7 @@ export default class BuyProductScreen extends React.Component {
             <PremiumText text={'Ad-free experience'} />
             <PremiumText text={'Pass Guarantee'} />
             <View style={{ borderTopColor: '#E8E8E8', borderTopWidth: 1, marginTop: EStyleSheet.value('10rem'), paddingTop: EStyleSheet.value('10rem'), paddingBottom: EStyleSheet.value('10rem') }}>
-              <TouchableWithoutFeedback style={{ flex: 1, alignItems: 'center' }} disabled={loading} onPress={() => that.startPurchase(productList[0].productId)}>
+              <TouchableWithoutFeedback style={{ flex: 1, alignItems: 'center' }} disabled={loading} onPress={() => this.startPurchase(productList[0].productId)}>
                 <View style={{ padding: EStyleSheet.value('8rem'), borderRadius: 10, textAlign: 'center', backgroundColor: '#a8e063' }}>
                   <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), textAlign: 'center' }}>UNLOCK PREMIUM</Text>
                   <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('12rem'), textAlign: 'center' }}>one-time fee of £4.99</Text>
@@ -244,8 +228,8 @@ export default class BuyProductScreen extends React.Component {
               <Text style={styles.bottom_view_text}>Restore purchase if you previously bought premium</Text>
             </View>
             <TouchableWithoutFeedback onPress={() => {
-              that.setState({ loading: true })
-              that.getPurchases()
+              this.setState({ loading: true })
+              this.getPurchases()
             }}>
               <Text style={styles.bottom_view_button}>Restore purchase</Text>
             </TouchableWithoutFeedback>
