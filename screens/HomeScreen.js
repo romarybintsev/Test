@@ -39,7 +39,7 @@ SELECT t1.* FROM questions as t1 Inner join latest_answer_per_question as t2 \
 ON t1.id = t2.question_id \
 AND t2.correct = 0';
 
-const accessToken = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAijPTCR2j1pTjn0Yd8NtJRiopTWgqym1gA6R/+t55oy9AoB550JqmT42KT20SlaVAWcBYPIGK5r6MugMVkR/ssW4tClWG/49FWtpbbEjkXE56qx6lyK4mdBJ9RAklhM+QdS61g+hZVWEznxel0Kcq4zaDzevU7CqDabPGMYsqxIgQ756IOGM5eaZeLu2shXmCcFp8Fzp1jf+x1oxvvU8ya8zM7a+iu3cQz+HW5Zp/lJQiXW1vDJgoV/lvsR6pXnoBFgHdjkVGPbQtK2laDZrkNf0CbE4M4iIcpiseQQUXndDsaKJThlRfLETVCVqD8h2gIn2xsXMurvJh4HhQFModRwIDAQAB';
+const accessToken = '';
 const packageName = 'uk.lifeintheuktest';
 const isSub = false;
 // Main Screen
