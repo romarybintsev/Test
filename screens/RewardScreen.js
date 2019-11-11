@@ -24,6 +24,7 @@ export default class RewardScreen extends React.Component {
         this.state = {
             update: false,
             text: '',
+            number_completed: 0,
         }
     }
 
@@ -97,8 +98,14 @@ todays_pin(){
   }
 
     componentDidMount(){
+        that = this;
         AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
+        if(Platform.OS === 'android'){
         AdMobRewarded.setAdUnitID('ca-app-pub-6187955227300148/7807300071');
+        }
+        else if (Platform.OS === 'ios') {
+          AdMobRewarded.setAdUnitID('ca-app-pub-6187955227300148/2220829267');
+        }
         AdMobRewarded.requestAd().catch(error => console.warn(error)); 
 
         AdMobRewarded.addEventListener('rewarded', () => {
@@ -119,6 +126,45 @@ todays_pin(){
             console.log('AdMobRewarded => adClosed');
             AdMobRewarded.requestAd().catch(error => console.warn(error));
           });
+          db.transaction(function (txn) { // Get Test Information
+            txn.executeSql(
+                'WITH latest_tests AS (\
+                SELECT test_id, MAX(created_date) as max_created_date FROM test_results\
+                GROUP BY 1\
+            ),\
+            \
+            test_num_of_questions AS (\
+                SELECT test_id, COUNT(id) as num_questions FROM questions\
+                GROUP BY 1\
+            ),\
+            \
+            latest_test_scores AS (\
+                SELECT tr.* FROM test_results AS tr INNER JOIN latest_tests AS lt \
+                ON tr.test_id = lt.test_id \
+                AND tr.created_date = lt.max_created_date\
+            )\
+            \
+            SELECT t.*, lts.result, tnoq.num_questions as num_questions FROM tests AS t LEFT JOIN latest_test_scores AS lts \
+            ON t.id = lts.test_id\
+            INNER JOIN test_num_of_questions AS tnoq \
+            ON t.id = tnoq.test_id',
+                [],
+                (txn, results) => {
+                    var len = results.rows.length;
+                    var number_completed = 0
+                    for (let i = 0; i < len; i++) {
+                        if(results.rows.item(i).result != null) {
+                          number_completed += 1
+                        }
+                    }
+                    that.setState({
+                      number_completed: number_completed,
+                    })
+                }
+            );
+        });
+        
+
     }
 
     componentWillUnmount() {
@@ -145,7 +191,7 @@ todays_pin(){
             <KeyboardAvoidingView behavior= {Platform.OS === 'ios' ? "position" : ""} enabled>
             <ScrollView style={{zIndex: 0}}>
             <View style={{marginTop: height/4, padding: EStyleSheet.value('20rem') }}>
-            {reviewed == 0 ?<View style={styles.premium_text_view}>
+            {reviewed == 0 && this.state.number_completed >= 8 ?<View style={styles.premium_text_view}>
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
               <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Leave us a review and unlock 5 more tests.</Text>
             </View>
@@ -176,7 +222,7 @@ todays_pin(){
                   <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Watch Now</Text>
                 </View>
                 <View style={{ flex: 0, alignSelf: 'center', borderRadius: EStyleSheet.value('14rem'), elevation: 2, }}>
-                  <FontAwesomeIcon style={reviewed == 1 ? {} : {
+                  <FontAwesomeIcon style={{
                     shadowColor: '#000',
                     shadowOffset: { width: 0, height: 1 },
                     shadowOpacity: 0.2,

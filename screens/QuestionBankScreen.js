@@ -96,7 +96,12 @@ export default class QuestionBankScreen extends Component {
     _quizFinish(score, questions, users_ans, correct_ans) {
         this.setState({ quizFinish: true, score: score, questions: questions, users_ans: users_ans, correct_ans: correct_ans });
         if(this.state.data.length > 5 && premium == 0) {
-            AdMobInterstitial.setAdUnitID('ca-app-pub-6187955227300148/9739823688');
+            if(Platform.OS === 'android'){
+                AdMobRewarded.setAdUnitID('ca-app-pub-6187955227300148/9739823688');
+            }
+            else if (Platform.OS === 'ios') {
+                AdMobRewarded.setAdUnitID('ca-app-pub-6187955227300148/9580444538');
+            }
             AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
             AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
         }
