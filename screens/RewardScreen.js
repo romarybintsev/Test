@@ -35,8 +35,10 @@ export default class RewardScreen extends React.Component {
       headerTransparent: true,
       headerLeft: null,
       headerRight: <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
-        <FontAwesomeIcon style={{ marginRight: EStyleSheet.value('15rem'), }} size={EStyleSheet.value('24rem')} color={'white'} icon={'times-circle'} />
-      </TouchableWithoutFeedback>,
+        <View style={{ paddingRight: EStyleSheet.value('15rem'), }}>
+        <FontAwesomeIcon size={EStyleSheet.value('24rem')} color={'white'} icon={'times-circle'} />
+        </View>
+        </TouchableWithoutFeedback>,
       tabBarVisible: false,
     };
   };
@@ -73,29 +75,29 @@ export default class RewardScreen extends React.Component {
       }
     })
   }
-todays_pin(){
-    var today = new Date();
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); 
-    var yyyy = today.getFullYear();
-    var pin = '72' + yyyy + mm;
-    return pin
-  }
+// todays_pin(){
+//     var today = new Date();
+//     var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+//     var yyyy = today.getFullYear();
+//     var pin = '72' + yyyy + mm;
+//     return pin
+//   }
 
-  unlock_with_pin(){
-      if(this.state.text == this.todays_pin()) {
-        db.transaction(function (txn) {
-            txn.executeSql(
-              'UPDATE config SET full_version=1', []
-            );
-          })
-          global.premium = 1
-          emitter.emit('update_tests', '');
-          Alert.alert('Success', 'You have successfully unlocked the Full Version.')
-      }
-      else{
-          Alert.alert('Oops', 'Looks like your PIN is incorrect.')
-      }
-  }
+//   unlock_with_pin(){
+//       if(this.state.text == this.todays_pin()) {
+//         db.transaction(function (txn) {
+//             txn.executeSql(
+//               'UPDATE config SET full_version=1', []
+//             );
+//           })
+//           global.premium = 1
+//           emitter.emit('update_tests', '');
+//           Alert.alert('Success', 'You have successfully unlocked the Full Version.')
+//       }
+//       else{
+//           Alert.alert('Oops', 'Looks like your PIN is incorrect.')
+//       }
+//   }
 
     componentDidMount(){
         that = this;
@@ -244,7 +246,7 @@ todays_pin(){
               </TouchableWithoutFeedback>
             </View>
           </View>
-          <View style={styles.premium_text_view}>
+          {/* <View style={styles.premium_text_view}>
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
               <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Have a PIN? Enter it here.</Text>
             </View>
@@ -265,7 +267,7 @@ todays_pin(){
                 </View>
                 </View>
               </View>
-          </View>
+          </View> */}
           </View>
          
           </ScrollView>

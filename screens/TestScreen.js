@@ -52,6 +52,7 @@ export default class TestScreen extends React.Component {
       expl_hidden: true,
       questionbank: questionbank,
       select_options: [],
+      header_height: QUESTION_MAX_HEIGHT,
     }
     that = this;
   }
@@ -195,6 +196,7 @@ export default class TestScreen extends React.Component {
     }
     return true
   }
+  
   check_answer(ans) {
     if (this.state.answered == false) {
       if (this.state.correctoption.length == 1) {
@@ -239,6 +241,13 @@ export default class TestScreen extends React.Component {
       // Do nothing
     }
 
+
+  }
+  onLayout(event){
+    const {x, y, height, width} = event.nativeEvent.layout;
+    this.setState({
+      header_height: height,
+    })
   }
   render() {
     let _this = this
@@ -310,8 +319,8 @@ export default class TestScreen extends React.Component {
     return (
       <View style={{ flex: 1, backgroundColor: 'rgb(248,248,248)', padding: EStyleSheet.value('16rem'), }}>
         <StatusBar barStyle="light-content" />
-        <View style={styles.header}>
-          <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1, padding: EStyleSheet.value('16rem') }}>
+        <View style={styles.header} onLayout={(event) => this.onLayout(event)} >
+          <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1, padding: EStyleSheet.value('16rem')}}>
             <View style={styles.question_view}>
               <Text style={styles.question_number}>Question {this.qno + 1} of {this.state.test_length}</Text>
               <Text style={[styles.question, { fontSize: this.state.question.length > 120 ? EStyleSheet.value('16rem') : EStyleSheet.value('20rem') }]}>
@@ -322,10 +331,10 @@ export default class TestScreen extends React.Component {
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           {this.state.expl_hidden ?
-            <View style={{ paddingBottom: EStyleSheet.value('20rem'), marginTop: QUESTION_MAX_HEIGHT }}>
+            <View style={{ paddingBottom: EStyleSheet.value('20rem'), marginTop: this.state.header_height }}>
               {this.state.correctoption.length == 1 ? options : multiple_options}
             </View> :
-            <View style={{ marginTop: QUESTION_MAX_HEIGHT }}>
+            <View style={{ marginTop: this.state.header_height }}>
               {correct_options}
               <View style={styles.explanation_view}>
                 <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), color: 'gray', marginBottom: 5 }}>Explanation</Text>
@@ -362,12 +371,14 @@ const styles = EStyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: QUESTION_MAX_HEIGHT,
+    minHeight: QUESTION_MAX_HEIGHT,
     zIndex: 101,
   },
   question_view: {
-    marginTop: QUESTION_MAX_HEIGHT / 3.5,
+    marginTop: QUESTION_MAX_HEIGHT / 4,
     marginLeft: '15rem',
+    flex: 1,
+    position: 'relative'
   },
   question_number: {
     fontFamily: 'Nunito-Light',

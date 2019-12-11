@@ -17,7 +17,7 @@
 		1F4C2E8DFE90629B16E6F3F8 /* libPods-TestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 64E36EF30A5498C40EBFBAD6 /* libPods-TestTests.a */; };
 		20775B6DFBC9BDE445C22E1B /* libPods-Test.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DCE403B9B8E62508693E61A /* libPods-Test.a */; };
 		241875EF2340E892004CFB5E /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 241875EE2340E892004CFB5E /* Images-2.xcassets */; };
-		2459DB1A237A382C001B980C /* www in Resources */ = {isa = PBXBuildFile; fileRef = 2459DB19237A382C001B980C /* www */; };
+		241B3E2923A00B4700040D0B /* www in Resources */ = {isa = PBXBuildFile; fileRef = 241B3E2823A00B4700040D0B /* www */; };
 		24ACA8EB234135BF00B6FCCE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ACA8EA234135BF00B6FCCE /* StoreKit.framework */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -86,7 +86,7 @@
 		1C4843C1559040169AE2A96E /* Nunito-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nunito-ExtraLight.ttf"; path = "../assets/fonts/Nunito-ExtraLight.ttf"; sourceTree = "<group>"; };
 		241875EB2340E4AD004CFB5E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		241875EE2340E892004CFB5E /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-2.xcassets"; path = "Test/Images-2.xcassets"; sourceTree = "<group>"; };
-		2459DB19237A382C001B980C /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../../www; sourceTree = "<group>"; };
+		241B3E2823A00B4700040D0B /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../../www; sourceTree = "<group>"; };
 		24ACA8EA234135BF00B6FCCE /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2D02E47B1E0B4A5D006451C7 /* Test-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Test-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Test-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Test-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -188,7 +188,7 @@
 		13B07FAE1A68108700A75B9A /* Test */ = {
 			isa = PBXGroup;
 			children = (
-				2459DB19237A382C001B980C /* www */,
+				241B3E2823A00B4700040D0B /* www */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -453,7 +453,7 @@
 				1DDAA2B97C5A4503AFCBD003 /* Roboto-BoldItalic.ttf in Resources */,
 				A10BEA2B65C642C0858A348B /* Roboto-Italic.ttf in Resources */,
 				EFCA0F9CDA1447D39D6D3145 /* Roboto-Light.ttf in Resources */,
-				2459DB1A237A382C001B980C /* www in Resources */,
+				241B3E2923A00B4700040D0B /* www in Resources */,
 				FA913DBB65DB4DA1A2E379B4 /* Roboto-LightItalic.ttf in Resources */,
 				56D8E0ACEA35412CA5367103 /* Roboto-Medium.ttf in Resources */,
 				2F227EC0C3E444FDBD3BF28C /* Roboto-MediumItalic.ttf in Resources */,
@@ -771,7 +771,7 @@
 				INFOPLIST_FILE = Test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.49;
+				MARKETING_VERSION = 1.51;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -794,7 +794,7 @@
 				INFOPLIST_FILE = Test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.49;
+				MARKETING_VERSION = 1.51;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

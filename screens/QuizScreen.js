@@ -106,7 +106,9 @@ export default class QuizScreen extends Component {
       headerLeft: null,
       headerTransparent: true,
       headerRight: <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
-        <FontAwesomeIcon style={{ marginRight: EStyleSheet.value('15rem'), }} size={EStyleSheet.value('24rem')} color={'white'} icon={'times-circle'} />
+        <View style={{ paddingRight: EStyleSheet.value('15rem') }}>
+        <FontAwesomeIcon size={EStyleSheet.value('24rem')} color={'white'} icon={'times-circle'} />
+        </View>
       </TouchableWithoutFeedback>,
       tabBarVisible: false,
     };
