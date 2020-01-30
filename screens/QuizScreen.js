@@ -118,10 +118,10 @@ export default class QuizScreen extends Component {
     this.setState({ quizFinish: true, score: score, questions: questions, users_ans: users_ans, correct_ans: correct_ans });
     if(test_id > 5 && premium == 0) {
       if(Platform.OS === 'android'){
-        AdMobRewarded.setAdUnitID('ca-app-pub-6187955227300148/9739823688');
+        AdMobInterstitial.setAdUnitID('ca-app-pub-6187955227300148/9739823688');
       }
       else if (Platform.OS === 'ios') {
-        AdMobRewarded.setAdUnitID('ca-app-pub-6187955227300148/9580444538');
+        AdMobInterstitial.setAdUnitID('ca-app-pub-6187955227300148/9580444538');
       }
     AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
     AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
