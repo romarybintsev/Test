@@ -16,12 +16,11 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 var { height, width } = Dimensions.get('window');
 EStyleSheet.build({ // always call EStyleSheet.build() even if you don't use global variables!
     
-    $rem: Platform.OS === 'ios' ? height < 1024 ? width / 380 : width /720 : height < 1024 ? height < 500 ? width/600 : width/450 : width/700,
+    $rem: Platform.OS === 'ios' ? height < 1024 ? width / 380 : width /720 : width < 760 ? height < 400 ? width/600 : width/450 : width/700,
     $restore_padding: height > 800 ? '15rem' : 0,
     $restore_top_padding: height > 800 ? '10rem' : 0,
 });
 var db = openDatabase({ name: 'mydb.db', createFromLocation: 1, location: 'Documents' });
-
 library.add(fab, far, faExclamationCircle, faCog, faLayerGroup, faLock, faStar, faHome, faTimesCircle, fas, faTimes, faChevronCircleLeft, faCheckSquare, faCoffee, faCheckCircle, faChevronRight, faCircle, faDotCircle, faPlayCircle, faAward)
 
 global.premium = 0
@@ -39,6 +38,7 @@ new Promise((resolve, reject) => {
     }, null, null);
 }).then((data) => {
     console.log('version: ', data)
+    console.log(height, width)
     global.premium = data.full_version
     global.free_tests = data.free_tests
     global.reviewed = data.review

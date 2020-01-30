@@ -1,8 +1,10 @@
 // Imports
 
 import React from 'react';
+import {Text} from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { TestsList } from '../components/tests_list';
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 // Variables
 
@@ -78,6 +80,18 @@ export default class CategoryTestsScreen extends React.Component {
             })
         })
     }
+    static navigationOptions = ({ navigation, navigationOptions }) => {
+        return {
+          headerTitle: <Text style={{fontFamily: 'Nunito-Regular',
+          color: 'white',
+          fontSize: EStyleSheet.value('20rem'),}}>All Tests</Text>,
+        //   headerTintColor: 'white',
+          headerLeft: null,
+          headerTransparent: true,
+          headerRight: null,
+          tabBarVisible: false,
+        };
+      };
     componentWillUnmount() {
         CheckScoreSubscription.remove()
         emitter.off('update_tests');

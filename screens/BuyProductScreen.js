@@ -1,7 +1,7 @@
 // Imports
 
 import React from 'react';
-import { Alert, Platform, StyleSheet, Text, View, StatusBar, ActivityIndicator, TouchableWithoutFeedback, Dimensions, } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, View, StatusBar, ActivityIndicator, TouchableWithoutFeedback, Dimensions, ScrollView } from 'react-native';
 import RNIap, { acknowledgePurchaseAndroid, purchaseErrorListener, purchaseUpdatedListener, } from 'react-native-iap';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import LinearGradient from 'react-native-linear-gradient';
@@ -57,6 +57,8 @@ export default class BuyProductScreen extends React.Component {
       receipt: '',
       availableItemsMessage: '',
       loading: true,
+      update: false,
+      number_completed: 0,
     };
   }
   that = this;
@@ -75,6 +77,36 @@ export default class BuyProductScreen extends React.Component {
     };
   };
 
+  review_button() {
+    const options = {
+      AppleAppID:"1481724919",
+      GooglePackageName:"uk.lifeintheuktest",
+      AmazonPackageName:"",
+      OtherAndroidURL:"",
+      preferredAndroidMarket: AndroidMarket.Google,
+      preferInApp:false,
+      openAppStoreIfInAppFails:true,
+      fallbackPlatformURL:"",
+    }
+    Rate.rate(options, success=>{
+      if (success) {
+        // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
+        db.transaction(function (txn) {
+          txn.executeSql(
+            'UPDATE config SET review = 1', []
+          );
+          txn.executeSql(
+            'UPDATE config SET free_tests = free_tests + 5', []
+          );
+        })
+        global.free_tests = free_tests + 5
+        setTimeout(() => {
+        global.reviewed = 1
+        this.setState({update: !this.state.update})}, 5000)
+
+      }
+    })
+  }
 
   // Set loader, find products and cancel loader after
   async componentDidMount() {
@@ -82,6 +114,44 @@ export default class BuyProductScreen extends React.Component {
     emitter.on('stop_loader', function () {
       that.setState({ loading: false,})
     });
+
+    db.transaction(function (txn) { // Get Test Information
+      txn.executeSql(
+          'WITH latest_tests AS (\
+          SELECT test_id, MAX(created_date) as max_created_date FROM test_results\
+          GROUP BY 1\
+      ),\
+      \
+      test_num_of_questions AS (\
+          SELECT test_id, COUNT(id) as num_questions FROM questions\
+          GROUP BY 1\
+      ),\
+      \
+      latest_test_scores AS (\
+          SELECT tr.* FROM test_results AS tr INNER JOIN latest_tests AS lt \
+          ON tr.test_id = lt.test_id \
+          AND tr.created_date = lt.max_created_date\
+      )\
+      \
+      SELECT t.*, lts.result, tnoq.num_questions as num_questions FROM tests AS t LEFT JOIN latest_test_scores AS lts \
+      ON t.id = lts.test_id\
+      INNER JOIN test_num_of_questions AS tnoq \
+      ON t.id = tnoq.test_id',
+          [],
+          (txn, results) => {
+              var len = results.rows.length;
+              var number_completed = 0
+              for (let i = 0; i < len; i++) {
+                  if(results.rows.item(i).result != null) {
+                    number_completed += 1
+                  }
+              }
+              that.setState({
+                number_completed: number_completed,
+              })
+          }
+      );
+  });
     try {
       const products = await RNIap.getProducts(itemSkus);
       // const products = await RNIap.getSubscriptions(itemSkus);
@@ -200,30 +270,35 @@ export default class BuyProductScreen extends React.Component {
             <PremiumText text={'Ad-free experience'} />
             <PremiumText text={'Pass Guarantee'} />
             <View style={{ borderTopColor: '#E8E8E8', borderTopWidth: 1, marginTop: EStyleSheet.value('10rem'), paddingTop: EStyleSheet.value('10rem'), paddingBottom: EStyleSheet.value('10rem') }}>
-              <TouchableWithoutFeedback style={{ flex: 1, alignItems: 'center' }} disabled={loading} onPress={() => this.startPurchase(productList[0].productId)}>
+              <TouchableWithoutFeedback style={{ flex: 1, alignItems: 'center' }} disabled={loading} onPress={!Array.isArray(productList) || !productList.length ?  () => alert('No internet connection') : () => this.startPurchase(productList[0].productId)}>
                 <View style={{ padding: EStyleSheet.value('8rem'), borderRadius: 10, textAlign: 'center', backgroundColor: '#a8e063' }}>
                   <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), textAlign: 'center' }}>UNLOCK PREMIUM</Text>
-                  <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('12rem'), textAlign: 'center' }}>one-time fee of £4.99</Text>
+                  <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('14rem'), textAlign: 'center' }}>one-time fee of £4.99</Text>
                 </View>
               </TouchableWithoutFeedback>
             </View>
           </View>
-
-          <View style={styles.premium_text_view}>
+          {reviewed == 0 && this.state.number_completed >= 2 ?
+            <View style={styles.premium_text_view}>
             <View style={{ borderBottomColor: '#E8E8E8', borderBottomWidth: 1, paddingBottom: EStyleSheet.value('10rem'), }}>
-              <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Want more tests for free?</Text>
+              <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), }}>Leave us a review and unlock 5 more tests.</Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Rewards')}>
+            <TouchableWithoutFeedback onPress={() => this.review_button()}>
               <View style={styles.review_option}>
                 <View style={{ alignSelf: 'center' }}>
-                  <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Unlock more tests</Text>
+                  <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem'), }}>Leave a Review</Text>
                 </View>
-                <View style={{ flex: 0, alignSelf: 'center' }}>
-                  <FontAwesomeIcon size={EStyleSheet.value('28rem')} icon={'chevron-right'} fill={'#E8E8E8'} />
+                <View style={{ flex: 0, alignSelf: 'center', borderRadius: EStyleSheet.value('14rem'), elevation: 2, }}>
+                  <FontAwesomeIcon style={{
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 2,
+                  }} size={EStyleSheet.value('28rem')} icon={'circle'} fill={'white'} />
                 </View>
               </View>
             </TouchableWithoutFeedback>
-          </View>
+          </View> : null}
 
           <View style={styles.bottom_view}>
             <View style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'gray' }}>
@@ -324,10 +399,11 @@ const styles = EStyleSheet.create({
   premium_list: {
     flexDirection: 'row',
     marginBottom: '5rem',
+    alignItems: 'center',
   },
   premium_list_text: {
     fontFamily: 'Nunito-Light',
-    fontSize: '18rem',
+    fontSize: '16rem',
     marginLeft: '10rem',
   },
   premium_text_view: {
