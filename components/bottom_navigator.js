@@ -13,7 +13,6 @@ import QuizScreen from '../screens/QuizScreen';
 import QuestionBankScreen from '../screens/QuestionBankScreen';
 import BuyProductScreen from '../screens/BuyProductScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import RewardScreen from '../screens/RewardScreen';
 
 // Stacks
 
@@ -46,9 +45,6 @@ const TestsStack = createStackNavigator({
     navigationOptions: () => ({
       headerTransparent: true,
     }),
-  },
-  Rewards: {
-    screen: RewardScreen,
   },
   Test: {
     screen: TestScreen,

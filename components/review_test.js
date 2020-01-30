@@ -13,13 +13,13 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 var { height, width } = Dimensions.get('window');
 if (height > 736) {
-  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 2 : height/2.3
+  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 2 : height/1.9
 }
 else if (height > 667 && height <= 736){
-  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 1.8 : height/2
+  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 1.8 : height/1.9
 }
 else {
-  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 1.9 : height/2
+  REVIEW_MAX_HEIGHT = Platform.OS === 'ios' ? height / 1.9 : height/1.9
 }
 REVIEW_MIN_HEIGHT =  Platform.OS === 'ios' ? height / 8 : height/11
 
@@ -98,8 +98,8 @@ export class ReviewTest extends React.Component {
     const defaultData = [{ x: 1, y: 1 }];
     const sharedProps = {
       standalone: false,
-      width: EStyleSheet.value('250rem'),
-      height: EStyleSheet.value('250rem'),
+      width: height*0.4,
+      height: height*0.4,
       labels: () => null
     };
     const headerHeight = this.state.scrollY.interpolate({
@@ -138,7 +138,7 @@ export class ReviewTest extends React.Component {
           <LinearGradient colors={['#396afc', '#2948ff']} style={{ flex: 1 }}>
             <View style={{ marginTop: REVIEW_MIN_HEIGHT}}>
               <Text style={{ textAlign: 'center', fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), color: 'white' }}>Test Result</Text>
-              <VictoryContainer width={EStyleSheet.value('250rem')} height={EStyleSheet.value('250rem')} style={{ alignSelf: 'center', marginTop: -35 }}>
+              <VictoryContainer width={height*0.4} height={height*0.4} style={{ alignSelf: 'center', marginTop: -35 }}>
                 <Defs>
                   <LinGrad id="gradient1"
                     x1="0%" y1="0%" x2="0%" y2="100%"
@@ -150,7 +150,7 @@ export class ReviewTest extends React.Component {
                 <VictoryPie
                   {...sharedProps}
                   data={defaultData}
-                  innerRadius={Platform.OS === 'ios' ? EStyleSheet.value('69rem'):EStyleSheet.value('60rem')}
+                  innerRadius={Platform.OS === 'ios' ? EStyleSheet.value('69rem'): height*0.1}
                   style={{
                     data: { fill: "gray", opacity: d => 0.3 }
                   }}
@@ -159,7 +159,7 @@ export class ReviewTest extends React.Component {
                   {...sharedProps}
                   animate={{ duration: 1000 }}
                   data={this.state.data}
-                  innerRadius={Platform.OS === 'ios' ? EStyleSheet.value('69rem'):EStyleSheet.value('60rem')}
+                  innerRadius={Platform.OS === 'ios' ? EStyleSheet.value('69rem'):height*0.1}
                   cornerRadius={({ datum }) => {
                     if (datum.x == 1) {
                       return 25
@@ -179,7 +179,7 @@ export class ReviewTest extends React.Component {
                 <VictoryContainer style={{ marginTop: EStyleSheet.value('7rem') }}>
                   <VictoryLabel
                     textAnchor="middle" verticalAnchor='middle'
-                    x={EStyleSheet.value('125rem')} y={EStyleSheet.value('125rem')}
+                    x={height*0.2} y={height*0.2}
                     text={text}
                     style={[{ fontSize: EStyleSheet.value('36rem'), fill: 'white', fontFamily: 'Roboto-Regular', fontWeight: '600', }, { fill: 'white', fontFamily: 'Roboto-Regular', fontWeight: '300', }]}
                   />

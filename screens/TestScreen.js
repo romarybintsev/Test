@@ -329,7 +329,7 @@ export default class TestScreen extends React.Component {
             </View>
           </LinearGradient>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled = {true}>
           {this.state.expl_hidden ?
             <View style={{ paddingBottom: EStyleSheet.value('20rem'), marginTop: this.state.header_height }}>
               {this.state.correctoption.length == 1 ? options : multiple_options}
@@ -338,8 +338,10 @@ export default class TestScreen extends React.Component {
               {correct_options}
               <View style={styles.explanation_view}>
                 <Text style={{ fontFamily: 'Nunito-Light', fontSize: EStyleSheet.value('16rem'), color: 'gray', marginBottom: 5 }}>Explanation</Text>
-                <ScrollView style={{ maxHeight: height / 5 }}>
+                <ScrollView style={{ maxHeight: height / 5,}} nestedScrollEnabled = {true}>
+                <TouchableWithoutFeedback>
                   <Text style={{ fontFamily: 'Nunito-Regular', fontSize: EStyleSheet.value('18rem') }}>{this.state.explanation}</Text>
+                  </TouchableWithoutFeedback>
                 </ScrollView>
               </View>
             </View>}

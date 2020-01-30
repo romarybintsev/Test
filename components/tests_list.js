@@ -11,7 +11,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 var { height, width } = Dimensions.get('window');
 if (height > 667) {
   HEADER_MAX_HEIGHT = height / 3
-  HEADER_MIN_HEIGHT = Platform.OS === 'ios' ? height / 8 : height/10
+  HEADER_MIN_HEIGHT = Platform.OS === 'ios' ? height / 8 : height*0.06
 }
 else {
   HEADER_MAX_HEIGHT = height / 2.5
@@ -105,7 +105,6 @@ export class TestsList extends Component {
     return (
       <View style={{ flex: 1, backgroundColor: '#E8E8E8' }}>
         <StatusBar barStyle="light-content" />
-        <Text style={styles.header_title}>All Tests</Text>
         <Animated.View style={{
           position: 'absolute',
           top: 0,
@@ -147,7 +146,7 @@ export class TestsList extends Component {
           )}
           data={data}
           renderItem={({ item }) =>
-            <TouchableWithoutFeedback style={styles.list_item} onPress={() => item.id <= free_tests || premium == 1 ? this.props.navigation.navigate('Quiz', { test_id: item.id, test_name: item.name }) : this.props.navigation.navigate('Rewards')}>
+            <TouchableWithoutFeedback style={styles.list_item} onPress={() => item.id <= free_tests || premium == 1 ? this.props.navigation.navigate('Quiz', { test_id: item.id, test_name: item.name }) : this.props.navigation.navigate('BuyProducts')}>
               <View style={styles.list_title_view}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.list_title}>{item.name}</Text>
@@ -196,15 +195,6 @@ const styles = EStyleSheet.create({
     color: 'white',
     fontSize: '30rem',
     fontFamily: 'Nunito-Bold',
-  },
-  header_title: {
-    position: 'absolute',
-    fontFamily: 'Nunito-Regular',
-    zIndex: 10,
-    color: 'white',
-    marginTop: HEADER_MIN_HEIGHT - 40,
-    fontSize: '20rem',
-    alignSelf: 'center',
   },
   bar_text: {
     color: 'white',
