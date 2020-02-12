@@ -52,7 +52,7 @@ export default class SettingsScreen extends React.Component {
             headerTitle: <Text style={styles.header_text}>Settings</Text>,
             headerTintColor: 'white',
             headerStyle: {
-                backgroundColor: '#2948ff',
+                backgroundColor: '#396afc',
             },
             headerLeft: null,
         };
@@ -167,7 +167,7 @@ export default class SettingsScreen extends React.Component {
 const styles = EStyleSheet.create({
     title: {
         fontFamily: 'Roboto-Bold',
-        fontSize: 14,
+        fontSize: '14rem',
         color: '#777777',
         marginBottom: '10rem',
         marginTop: '20rem',

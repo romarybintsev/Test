@@ -13,7 +13,10 @@ import QuizScreen from '../screens/QuizScreen';
 import QuestionBankScreen from '../screens/QuestionBankScreen';
 import BuyProductScreen from '../screens/BuyProductScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-
+import CheatSheet from '../screens/CheatSheet';
+import BookScreen from '../screens/HandBook';
+import ChapterScreen from '../screens/Chapter';
+import ResultsScreen from '../screens/ResultsScreen';
 // Stacks
 
 const HomeStack = createStackNavigator({
@@ -27,9 +30,9 @@ const HomeStack = createStackNavigator({
   BuyProducts: {
     screen: BuyProductScreen,
   },
-  QuestionBank: {
-    screen: QuestionBankScreen,
-  },
+  CheatSheet:{
+    screen: CheatSheet,
+  }
 }, {
   headerLayoutPreset: 'center',
   navigationOptions: ({ navigation }) => ({
@@ -52,6 +55,15 @@ const TestsStack = createStackNavigator({
   Quiz: {
     screen: QuizScreen,
   },
+  QuestionBank: {
+    screen: QuestionBankScreen,
+  },
+  ResultsScreen: {
+    screen: ResultsScreen,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
+  }
 }, {
   navigationOptions: ({ navigation }) => ({
     tabBarVisible: navigation.state.routes[navigation.state.index].routeName == 'CategoryTests',
@@ -64,6 +76,19 @@ const SettingsStack = createStackNavigator({
 }, {
   headerLayoutPreset: 'center',
 });
+
+const BookStack = createStackNavigator({
+  Book: {
+    screen: BookScreen,
+  },
+  Chapter: {
+    screen: ChapterScreen,
+    headerMode: 'none',
+    navigationOptions: () => ({
+      headerTransparent: true,
+    }),
+  }
+})
 
 
 const BottomTabNavigator = createBottomTabNavigator({
@@ -80,6 +105,14 @@ const BottomTabNavigator = createBottomTabNavigator({
     navigationOptions: {
       tabBarIcon: ({ tintColor }) => (
         <FontAwesomeIcon icon='layer-group' size={25} fill={tintColor} />
+      )
+    }
+  },
+  Book: {
+    screen: BookStack,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+        <FontAwesomeIcon icon='book' size={25} fill={tintColor} />
       )
     }
   },

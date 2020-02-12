@@ -124,7 +124,9 @@ PODS:
     - React
   - RNScreens (1.0.0-alpha.23):
     - React
-  - RNSVG (9.13.3):
+  - RNStaticSafeAreaInsets (2.0.0):
+    - React
+  - RNSVG (11.0.1):
     - React
   - yoga (0.60.6.React)
 
@@ -158,6 +160,7 @@ DEPENDENCIES:
   - RNRate (from `../node_modules/react-native-rate`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNStaticSafeAreaInsets (from `../node_modules/react-native-static-safe-area-insets`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -226,6 +229,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNStaticSafeAreaInsets:
+    :path: "../node_modules/react-native-static-safe-area-insets"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   yoga:
@@ -265,6 +270,7 @@ SPEC CHECKSUMS:
   RNRate: 9bbaa1e3f3043b1a7506e31e99ff19098a2b9079
   RNReanimated: 9f7976535c5cde50189acd84751871f5414190b9
   RNScreens: 354046589421edc3d83d5c6212475bf1fb9a731d
+  RNStaticSafeAreaInsets: 36a3e170b1d5f4726ad3d80b9e8c43548d117f1b
   RNSVG: 2e097b92aaa6d4e0f354fd7c49cbf3b17f8b3920
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 

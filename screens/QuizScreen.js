@@ -115,7 +115,7 @@ export default class QuizScreen extends Component {
   };
 
   _quizFinish(score, questions, users_ans, correct_ans) {
-    this.setState({ quizFinish: true, score: score, questions: questions, users_ans: users_ans, correct_ans: correct_ans });
+    // this.setState({ quizFinish: true, score: score, questions: questions, users_ans: users_ans, correct_ans: correct_ans });
     if(test_id > 5 && premium == 0) {
       if(Platform.OS === 'android'){
         AdMobInterstitial.setAdUnitID('ca-app-pub-6187955227300148/9739823688');
@@ -126,15 +126,19 @@ export default class QuizScreen extends Component {
     AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
     AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
     }
+    this.props.navigation.navigate("ResultsScreen", {
+      score:score,
+      pass_mark:this.state.pass_mark,
+      ans:users_ans,
+      data:this.state.data,
+    });
   }
 
   render() {
     if (this.state.loaded) {
       return (
         <View style={{ flex: 1 }}>
-          {this.state.quizFinish ?
-            <ReviewTest score={this.state.score} pass_mark={this.state.pass_mark} ans={this.state.users_ans} data={this.state.data} />
-            : <TestScreen send_test_id={this.state.test_id} questionbank={this.state.questionbank} send_data={this.state.data} quizFinish={(score, questions, users_ans, correct_ans) => this._quizFinish(score, questions, users_ans, correct_ans)} />}
+<TestScreen send_test_id={this.state.test_id} questionbank={this.state.questionbank} send_data={this.state.data} quizFinish={(score, questions, users_ans, correct_ans) => this._quizFinish(score, questions, users_ans, correct_ans)} />
         </View>
       );
     }

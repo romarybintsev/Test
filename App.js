@@ -6,7 +6,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { far, faTimesCircle } from '@fortawesome/free-regular-svg-icons'
 import { fas } from '@fortawesome/free-solid-svg-icons'
-import { faAward,faCog, faLayerGroup, faExclamationCircle, faHome, faStar, faTimes, faCheckSquare, faChevronCircleLeft, faCoffee, faCheckCircle, faChevronRight, faCircle, faDotCircle, faLock, faPlayCircle } from '@fortawesome/free-solid-svg-icons'
+import { faAward,faCog,faBook, faLayerGroup, faExclamationCircle, faHome, faStar, faTimes, faCheckSquare, faChevronCircleLeft, faCoffee, faCheckCircle, faChevronRight, faCircle, faDotCircle, faLock, faPlayCircle } from '@fortawesome/free-solid-svg-icons'
 import { openDatabase } from 'react-native-sqlite-storage';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
@@ -16,7 +16,8 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 var { height, width } = Dimensions.get('window');
 EStyleSheet.build({ // always call EStyleSheet.build() even if you don't use global variables!
     
-    $rem: Platform.OS === 'ios' ? height < 1024 ? width / 380 : width /720 : width < 760 ? height < 400 ? width/600 : width/450 : width/700,
+    // $rem: Platform.OS === 'ios' ? height < 1024 ? width / 380 : width /720 : width < 760 ? height < 400 ? width/600 : width/450 : width/700,
+    $rem: Platform.OS === 'ios' ? width < 768 ? width/400 : width/500 : width < 500 ? width/480 : width/500,
     $restore_padding: height > 800 ? '15rem' : 0,
     $restore_top_padding: height > 800 ? '10rem' : 0,
 });

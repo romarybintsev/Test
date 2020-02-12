@@ -262,12 +262,7 @@ export default class TestScreen extends React.Component {
                 <Text style={styles.list_title}>{currentOptions[k]}</Text>
               </View>
               <View style={{ flex: 0, marginLeft: 8,alignSelf: 'center', backgroundColor:'white',}}>
-                <FontAwesomeIcon style= { Platform.OS === 'android' ? {borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}:{
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 2,
-                }} size={EStyleSheet.value('28rem')} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
+                <FontAwesomeIcon style= {{borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}} size={EStyleSheet.value('28rem')} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -284,12 +279,7 @@ export default class TestScreen extends React.Component {
                 <Text style={styles.list_title}>{currentOptions[k]}</Text>
               </View>
               <View style={{ flex: 0, marginLeft: 8,alignSelf: 'center', backgroundColor:'white'}}>
-                <FontAwesomeIcon style= { Platform.OS === 'android' ? {borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}:{
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 2,
-                }} size={EStyleSheet.value('28rem')} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
+                <FontAwesomeIcon style= {{borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}} size={EStyleSheet.value('28rem')} color={_this.change_color(k).btn_color} icon={_this.change_color(k).icon_name} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -305,12 +295,7 @@ export default class TestScreen extends React.Component {
             <Text style={styles.list_title}>{currentOptions[k]} </Text>
           </View>
           <View style={{ flex: 0, marginLeft: 8,alignSelf: 'center', backgroundColor:'white'}}>
-            <FontAwesomeIcon style= { Platform.OS === 'android' ? {borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}:{
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.2,
-              shadowRadius: 2,
-            }} size={EStyleSheet.value('28rem')} color={'#4AB027'} icon={'check-circle'} />
+            <FontAwesomeIcon style= {{borderWidth: EStyleSheet.value('0.5rem'), borderColor: '#C0C0C0', borderRadius: EStyleSheet.value('14rem')}} size={EStyleSheet.value('28rem')} color={'#4AB027'} icon={'check-circle'} />
           </View>
         </View>
       )

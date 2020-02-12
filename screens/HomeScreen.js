@@ -215,6 +215,8 @@ export default class HomeScreen extends React.Component {
           <View style={{ flex: 1, marginTop: EStyleSheet.value('20rem'), marginBottom: EStyleSheet.value('10rem'), zIndex: 1, }}>
             <HomeCard navigate_to={() => this.props.navigation.navigate('CategoryTests')} title='Practice Tests' second_text={this.state.num_completed + ' of ' + this.state.test_len + ' tests completed'} />
             <HomeCard navigate_to={() => this.props.navigation.navigate('QuestionBank')} title='Challenge Bank' second_text={this.state.question_bank_len + (this.state.question_bank_len == 1 ? ' question in the bank' : ' questions in the bank')} question_bank={this.state.question_bank_len} />
+            <HomeCard navigate_to={() => this.props.navigation.navigate('CheatSheet')} title='Cheat Sheet' second_text={'Key Material and Facts'} />
+
             {premium == 0 ? <HomeCard navigate_to={() => this.props.navigation.navigate('BuyProducts')} title='Premium' second_text='Unlock all tests and more' /> : null}
           </View>
           <Image style={{ alignSelf: 'center', width: width, height: width/2.5, position: 'absolute', bottom: 0, opacity: 0.2, }} source={require('../assets/img/home.png')} />
