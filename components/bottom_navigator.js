@@ -88,7 +88,7 @@ const BookStack = createStackNavigator({
       headerTransparent: true,
     }),
   }
-})
+}, {headerLayoutPreset: 'center'})
 
 
 const BottomTabNavigator = createBottomTabNavigator({

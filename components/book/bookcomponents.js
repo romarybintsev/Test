@@ -104,7 +104,7 @@ export function ImageCard(props){
 export function CustomHeader(props){
     return(
         <View style={{backgroundColor: '#396afc',}} >
-        <View style={{height: StaticSafeAreaInsets.safeAreaInsetsTop,  }} />
+        <View style={{height: Platform.OS === 'ios' ? StaticSafeAreaInsets.safeAreaInsetsTop : null,  }} />
         <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row',}}>
         <TouchableWithoutFeedback onPress={() => props.navigation.popToTop()}>
           <View

@@ -122,6 +122,8 @@ def enableHermes = project.ext.react.get("enableHermes", false);
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+    aaptOptions { cruncherEnabled = false }
+    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -131,8 +133,8 @@ android {
         applicationId "uk.lifeintheuktest"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 17
-        versionName "1.17"
+        versionCode 18
+        versionName "1.18"
     }
     splits {
         abi {

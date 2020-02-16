@@ -56,7 +56,7 @@ export default class HandBook extends React.Component {
                 <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 16})} title='Religion' />
                 <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 17})} title='Customs and traditions' />
                 <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 18})} title='Sports' />
-                <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 19})} title='Arts aand culture' />
+                <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 19})} title='Arts and culture' />
                 <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 20})} title='Leisure' />
                 <ChapterOption onclick={() => this.props.navigation.navigate('Chapter', {page_number: 21})} title='Places of interest' />
 
